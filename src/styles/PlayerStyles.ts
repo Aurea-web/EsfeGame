@@ -1,6 +1,6 @@
 import { ImageStyle, StyleSheet, ViewStyle } from "react-native";
 
-export const playerFrameSize = 80;
+export const playerFrameSize = 104;
 
 export const playerStyles = StyleSheet.create({
   container: {

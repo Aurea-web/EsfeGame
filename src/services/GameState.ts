@@ -7,8 +7,8 @@ import Ground from "../entities/Ground";
 import Player from "../entities/Player";
 
 const { width, height } = Dimensions.get("window");
-export const worldWidth = Math.max(width * 2.5, width + 400);
-export const worldHeight = Math.max(height * 1.15, 390);
+export const worldWidth = Math.max(width * 3, width + 600);
+export const worldHeight = Math.max(height * 1.35, 420);
 const groundY = worldHeight - 58;
 
 export type GameState = {
@@ -21,7 +21,7 @@ export const createGameState = (): GameState => {
   const engine = Matter.Engine.create();
   const world = engine.world;
 
-  const player = Matter.Bodies.rectangle(100, groundY - 65, 40, 40, {
+  const player = Matter.Bodies.rectangle(100, groundY - 59, 58, 58, {
     friction: 0.05,
     frictionAir: 0.005,
     frictionStatic: 0,

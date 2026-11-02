@@ -71,7 +71,7 @@ export default function Player({ body }: PlayerProps) {
         playerStyles.container,
         getPlayerPositionStyle(
           body.position.x - playerFrameSize / 2,
-          body.position.y - (playerFrameSize - 20)
+          body.position.y - (playerFrameSize - 29)
         ),
       ]}
     >

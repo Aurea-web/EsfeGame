@@ -6,6 +6,8 @@ import CollisionSystem from "../systems/CollisionSystem";
 import { gameScreenStyles } from "../styles/GameScreenStyles";
 import GameWorldRenderer from "./GameWorldRenderer";
 
+const MAX_PHYSICS_STEP_MS = 16.6;
+
 type MovementDirection = "left" | "right" | null;
 
 type GameSceneProps = {
@@ -51,7 +53,10 @@ export default function GameScene({
             });
           }
 
-          Matter.Engine.update(engine, 16.667);
+          Matter.Engine.update(
+            engine,
+            Math.min(Math.max(time.delta || MAX_PHYSICS_STEP_MS, 1), MAX_PHYSICS_STEP_MS)
+          );
           return currentEntities;
         },
         CollisionSystem,
