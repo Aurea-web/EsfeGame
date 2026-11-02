@@ -20,7 +20,8 @@ export default function MobileControls({
 }: MobileControlsProps) {
   return (
     <View style={styles.container}>
-      <Pressable
+      <View style={styles.movementControls}>
+        <Pressable
         accessibilityLabel="Correr a la izquierda"
         accessibilityRole="button"
         onPressIn={onMoveLeftIn}
@@ -29,25 +30,26 @@ export default function MobileControls({
           styles.button,
           pressed && styles.pressedButton,
         ]}
-      >
-        <LinearGradient colors={["#007BFF", "#00CFFF"]} style={styles.gradientButton}>
-          <Text style={styles.buttonText}>←</Text>
-        </LinearGradient>
-      </Pressable>
-      <Pressable
-        accessibilityLabel="Correr a la derecha"
-        accessibilityRole="button"
-        onPressIn={onMoveRightIn}
-        onPressOut={onMoveRightOut}
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.pressedButton,
-        ]}
-      >
-        <LinearGradient colors={["#007BFF", "#00CFFF"]} style={styles.gradientButton}>
-          <Text style={styles.buttonText}>→</Text>
-        </LinearGradient>
-      </Pressable>
+        >
+          <LinearGradient colors={["rgba(0,123,255,0.38)", "rgba(0,207,255,0.38)"]} style={styles.gradientButton}>
+            <Text style={styles.buttonText}>←</Text>
+          </LinearGradient>
+        </Pressable>
+        <Pressable
+          accessibilityLabel="Correr a la derecha"
+          accessibilityRole="button"
+          onPressIn={onMoveRightIn}
+          onPressOut={onMoveRightOut}
+          style={({ pressed }) => [
+            styles.button,
+            pressed && styles.pressedButton,
+          ]}
+        >
+          <LinearGradient colors={["rgba(0,123,255,0.38)", "rgba(0,207,255,0.38)"]} style={styles.gradientButton}>
+            <Text style={styles.buttonText}>→</Text>
+          </LinearGradient>
+        </Pressable>
+      </View>
       <Pressable
         accessibilityLabel="Saltar"
         accessibilityRole="button"
@@ -57,7 +59,7 @@ export default function MobileControls({
           pressed && styles.pressedButton,
         ]}
       >
-        <LinearGradient colors={["#007BFF", "#00CFFF"]} style={styles.gradientButton}>
+        <LinearGradient colors={["rgba(0,123,255,0.38)", "rgba(0,207,255,0.38)"]} style={styles.gradientButton}>
           <Text style={styles.buttonText}>↑</Text>
         </LinearGradient>
       </Pressable>

@@ -1,4 +1,7 @@
 import { useFonts } from "expo-font";
+import { useEffect } from "react";
+import * as ScreenOrientation from "expo-screen-orientation";
+import { StatusBar } from "expo-status-bar";
 import Navigation from "./src/navigation";
 
 export default function App() {
@@ -7,7 +10,18 @@ export default function App() {
     Fredoka: require("./assets/fonts/Fredoka.ttf"),
   });
 
+  useEffect(() => {
+    ScreenOrientation.lockAsync(
+      ScreenOrientation.OrientationLock.LANDSCAPE
+    );
+  }, []);
+
   if (!fontsLoaded) return null;
 
-  return <Navigation />;
+  return (
+    <>
+      <StatusBar hidden />
+      <Navigation />
+    </>
+  );
 }

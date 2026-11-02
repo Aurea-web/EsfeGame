@@ -15,6 +15,7 @@ type GameSceneProps = {
   isPaused: boolean;
   getMovementDirection: () => MovementDirection;
   onEvent: (event: { type: string }) => void;
+  level?: number;
 };
 
 export default function GameScene({
@@ -24,13 +25,16 @@ export default function GameScene({
   isPaused,
   getMovementDirection,
   onEvent,
+  level = 1,
 }: GameSceneProps) {
   return (
     <GameEngine
       key={gameKey}
       style={gameScreenStyles.engine}
       running={!isPaused}
-      renderer={GameWorldRenderer}
+      renderer={(entities: Record<string, any>, screen: any, layout: any) =>
+        GameWorldRenderer(entities, screen, layout, level)
+      }
       systems={[
         (currentEntities: any, { time }: any) => {
           const player = currentEntities.player?.body as Matter.Body | undefined;
@@ -47,7 +51,7 @@ export default function GameScene({
             });
           }
 
-          Matter.Engine.update(engine, Math.min(time.delta, 16.667));
+          Matter.Engine.update(engine, 16.667);
           return currentEntities;
         },
         CollisionSystem,

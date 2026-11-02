@@ -172,6 +172,7 @@ export default function GameScreen({ navigation, route }: any) {
           isPaused={isPaused}
           getMovementDirection={getMovementDirection}
           onEvent={handleEvent}
+          level={route.params?.level ?? 1}
         />
         <PauseMenu
           isPaused={isPaused}

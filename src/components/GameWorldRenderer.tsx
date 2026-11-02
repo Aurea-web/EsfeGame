@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { ImageBackground, View } from "react-native";
 
 import { worldHeight, worldWidth } from "../services/GameState";
 import {
@@ -10,7 +10,8 @@ import {
 export default function GameWorldRenderer(
   entities: Record<string, any> | null,
   screen: any,
-  layout: any
+  layout: any,
+  level: number
 ) {
   if (!entities?.player || !layout) return null;
 
@@ -24,13 +25,21 @@ export default function GameWorldRenderer(
   const cameraY = Math.max(
     0,
     Math.min(
-      entities.player.body.position.y - layout.height * 0.55,
+      entities.player.body.position.y - layout.height * 0.48,
       worldHeight - layout.height
     )
   );
 
   return (
     <View style={gameScreenStyles.worldViewport}>
+      {level === 1 && (
+        <ImageBackground
+          source={require("../../assets/La cama.jpg")}
+          resizeMode="cover"
+          style={gameScreenStyles.levelBackground}
+          imageStyle={gameScreenStyles.levelBackgroundImage}
+        />
+      )}
       <View
         style={[
           gameScreenStyles.worldContent,

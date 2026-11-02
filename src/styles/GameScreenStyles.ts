@@ -74,7 +74,18 @@ export const gameScreenStyles = StyleSheet.create({
   worldViewport: {
     flex: 1,
     overflow: "hidden",
-    backgroundColor: "#bae6fd",
+    backgroundColor: "#090D1D",
+  },
+  levelBackground: {
+    position: "absolute",
+    width: "100%",
+    height: "120%",
+    bottom: 0,
+    overflow: "hidden",
+  },
+  levelBackgroundImage: {
+    width: "100%",
+    height: "100%",
   },
   worldContent: {
     position: "absolute",

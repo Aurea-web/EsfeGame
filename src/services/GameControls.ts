@@ -7,7 +7,7 @@ export const moveLeft = (
   Matter.Body.setVelocity(
     player,
     {
-      x: -5,
+      x: -8,
       y: player.velocity.y,
     }
   );
@@ -21,7 +21,7 @@ export const moveRight = (
   Matter.Body.setVelocity(
     player,
     {
-      x: 5,
+      x: 8,
       y: player.velocity.y,
     }
   );
@@ -37,7 +37,7 @@ export const jump = (
     player,
     {
       x: player.velocity.x,
-      y: -10,
+      y: -13,
     }
   );
 

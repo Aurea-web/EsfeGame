@@ -8,12 +8,8 @@ import Player from "../entities/Player";
 
 const { width, height } = Dimensions.get("window");
 export const worldWidth = Math.max(width * 2.5, width + 400);
-const platformPositions = [150, 310, 490, 680, 830, 680, 490, 310, 160, 340];
-export const worldHeight = Math.max(
-  height * 2.2,
-  height + platformPositions.length * 125 + 200
-);
-const groundY = worldHeight - 35;
+export const worldHeight = Math.max(height * 1.15, 390);
+const groundY = worldHeight - 58;
 
 export type GameState = {
   engine: Matter.Engine;
@@ -37,14 +33,18 @@ export const createGameState = (): GameState => {
     worldWidth / 2,
     groundY,
     worldWidth,
-    40,
+    58,
     { isStatic: true, restitution: 0.12 }
   );
+  const platformPositions = Array.from({ length: 10 }, (_, index) =>
+    170 + ((worldWidth - 340) / 9) * index
+  );
+  const platformHeights = [105, 155, 125, 180, 145, 195, 160, 210, 175, 225];
   const platforms = platformPositions.map((x, index) => {
     const platform = Matter.Bodies.rectangle(
       x,
-      groundY - 125 * (index + 1),
-      120,
+      groundY - platformHeights[index],
+      150,
       20,
       { isStatic: true, restitution: 0.12 }
     );

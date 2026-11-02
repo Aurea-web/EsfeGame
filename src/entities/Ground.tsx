@@ -1,5 +1,7 @@
 import React from "react";
-import { View } from "react-native";
+import { Image, View } from "react-native";
+
+const platformTexture = require("../../assets/SueloPrincipalPixel.png");
 
 const Ground = ({ body }: any) => {
   const width = body.bounds.max.x - body.bounds.min.x;
@@ -16,9 +18,14 @@ const Ground = ({ body }: any) => {
         top: y,
         width,
         height,
-        backgroundColor: "#444",
       }}
-    />
+      >
+      <Image
+        source={platformTexture}
+        resizeMode="repeat"
+        style={{ width: "100%", height: "100%" }}
+      />
+    </View>
   );
 };
 
