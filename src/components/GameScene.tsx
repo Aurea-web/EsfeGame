@@ -47,7 +47,7 @@ export default function GameScene({
             });
           }
 
-          Matter.Engine.update(engine, time.delta);
+          Matter.Engine.update(engine, Math.min(time.delta, 16.667));
           return currentEntities;
         },
         CollisionSystem,
