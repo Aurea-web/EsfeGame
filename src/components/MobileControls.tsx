@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { mobileControlsStyles as styles } from "../styles/MobileControlsStyles";
 
@@ -29,18 +30,9 @@ export default function MobileControls({
           pressed && styles.pressedButton,
         ]}
       >
-        <Text style={styles.buttonText}>←</Text>
-      </Pressable>
-      <Pressable
-        accessibilityLabel="Saltar"
-        accessibilityRole="button"
-        onPressIn={onJump}
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.pressedButton,
-        ]}
-      >
-        <Text style={styles.buttonText}>↑</Text>
+        <LinearGradient colors={["#007BFF", "#00CFFF"]} style={styles.gradientButton}>
+          <Text style={styles.buttonText}>←</Text>
+        </LinearGradient>
       </Pressable>
       <Pressable
         accessibilityLabel="Correr a la derecha"
@@ -52,7 +44,22 @@ export default function MobileControls({
           pressed && styles.pressedButton,
         ]}
       >
-        <Text style={styles.buttonText}>→</Text>
+        <LinearGradient colors={["#007BFF", "#00CFFF"]} style={styles.gradientButton}>
+          <Text style={styles.buttonText}>→</Text>
+        </LinearGradient>
+      </Pressable>
+      <Pressable
+        accessibilityLabel="Saltar"
+        accessibilityRole="button"
+        onPressIn={onJump}
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.pressedButton,
+        ]}
+      >
+        <LinearGradient colors={["#007BFF", "#00CFFF"]} style={styles.gradientButton}>
+          <Text style={styles.buttonText}>↑</Text>
+        </LinearGradient>
       </Pressable>
     </View>
   );
