@@ -37,7 +37,7 @@ export const jump = (
     player,
     {
       x: player.velocity.x,
-      y: -13,
+      y: -6.5,
     }
   );
 

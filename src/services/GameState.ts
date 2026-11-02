@@ -17,15 +17,17 @@ export type GameState = {
   entities: Record<string, any>;
 };
 
-export const createGameState = (): GameState => {
+export const createGameState = (level = 1): GameState => {
   const engine = Matter.Engine.create();
   const world = engine.world;
+  engine.gravity.y = 1.15;
+  engine.gravity.scale = 0.001;
 
   const player = Matter.Bodies.rectangle(100, groundY - 59, 58, 58, {
     friction: 0.05,
     frictionAir: 0.005,
     frictionStatic: 0,
-    restitution: 0.12,
+    restitution: 0.05,
   });
   player.label = "player";
 
@@ -56,6 +58,32 @@ export const createGameState = (): GameState => {
 
     return { platform, coin };
   });
+
+  const parkourPlatforms =
+    level === 1
+      ? [
+          { x: worldWidth * 0.43, heightAboveGround: 70, width: 110 },
+          { x: worldWidth * 0.49, heightAboveGround: 115, width: 110 },
+          { x: worldWidth * 0.55, heightAboveGround: 160, width: 110 },
+          { x: worldWidth * 0.61, heightAboveGround: 205, width: 110 },
+          { x: worldWidth * 0.67, heightAboveGround: 250, width: 110 },
+          { x: worldWidth * 0.73, heightAboveGround: 295, width: 110 },
+        ].map(({ x, heightAboveGround, width: platformWidth }, index) => {
+          const platform = Matter.Bodies.rectangle(
+            x,
+            groundY - heightAboveGround,
+            platformWidth,
+            20,
+            { isStatic: true, restitution: 0.12 }
+          );
+          const coin = Matter.Bodies.circle(x, platform.position.y - 38, 10, {
+            isStatic: true,
+            isSensor: true,
+          });
+          coin.label = "coin";
+          return { platform, coin, index };
+        })
+      : [];
   const lastPlatform = platforms[platforms.length - 1].platform;
   const door = Matter.Bodies.rectangle(
     lastPlatform.position.x,
@@ -86,6 +114,8 @@ export const createGameState = (): GameState => {
     player,
     ground,
     door,
+    ...parkourPlatforms.map(({ platform }) => platform),
+    ...parkourPlatforms.map(({ coin }) => coin),
     ...sideWalls,
     ...platforms.flatMap(({ platform, coin }) => [platform, coin]),
   ]);
@@ -103,6 +133,17 @@ export const createGameState = (): GameState => {
       renderer: Ground,
     };
     entities[`coin${index + 1}`] = {
+      body: coin,
+      renderer: Coin,
+    };
+  });
+
+  parkourPlatforms.forEach(({ platform, coin, index }) => {
+    entities[`parkourPlatform${index + 1}`] = {
+      body: platform,
+      renderer: Ground,
+    };
+    entities[`parkourCoin${index + 1}`] = {
       body: coin,
       renderer: Coin,
     };

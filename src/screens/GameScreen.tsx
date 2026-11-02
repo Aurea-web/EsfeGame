@@ -13,7 +13,9 @@ import { gameScreenStyles } from "../styles/GameScreenStyles";
 
 export default function GameScreen({ navigation, route }: any) {
   const [score, setScore] = useState(0);
-  const [game, setGame] = useState(createGameState);
+  const [game, setGame] = useState(() =>
+    createGameState(route.params?.level ?? 1)
+  );
   const [gameKey, setGameKey] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(120);
@@ -94,7 +96,7 @@ export default function GameScreen({ navigation, route }: any) {
 
   const restartGame = () => {
     pressedDirections.current = { left: false, right: false };
-    const restartedGame = createGameState();
+    const restartedGame = createGameState(route.params?.level ?? 1);
     playerRef.current = restartedGame.player;
     setGame(restartedGame);
     setGameKey((key) => key + 1);
