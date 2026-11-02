@@ -31,6 +31,7 @@ export const moveRight = (
 export const jump = (
   player: Matter.Body
 ) => {
+  if (Math.abs(player.velocity.y) > 0.75) return;
 
   Matter.Body.setVelocity(
     player,

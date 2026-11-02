@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Image, Text, View } from "react-native";
 import Matter from "matter-js";
 
@@ -10,10 +10,14 @@ import {
 } from "../styles/PlayerStyles";
 
 const walkSprite = require("../../assets/Walk.png");
+const walkLeftSprite = require("../../assets/Walk_izquierda.png");
+const jumpRightSprite = require("../../assets/Salto_Femenino_Derecha.png");
+const jumpLeftSprite = require("../../assets/Salto_Femenino_Izquierda.png");
 const idleSprite = require("../../assets/Idle.png");
 const walkFrameCount = 12;
 const idleFrameCount = 9;
 const movementThreshold = 0.1;
+const jumpThreshold = 0.75;
 
 type PlayerProps = {
   body: Matter.Body;
@@ -21,29 +25,45 @@ type PlayerProps = {
 
 export default function Player({ body }: PlayerProps) {
   const isMoving = Math.abs(body.velocity.x) > movementThreshold;
-  const frameCount = isMoving ? walkFrameCount : idleFrameCount;
-  const [animation, setAnimation] = useState({ isMoving: false, frame: 0 });
-  const frame = animation.isMoving === isMoving ? animation.frame : 0;
+  const isMovingLeft = body.velocity.x < -movementThreshold;
+  const isJumping = Math.abs(body.velocity.y) > jumpThreshold;
+  const facingLeft = useRef(false);
+
+  if (isMovingLeft) facingLeft.current = true;
+  if (body.velocity.x > movementThreshold) facingLeft.current = false;
+
+  const animationName = isJumping ? "jump" : isMoving ? "walk" : "idle";
+  const frameCount =
+    animationName === "walk"
+      ? walkFrameCount
+      : animationName === "jump"
+        ? walkFrameCount
+        : idleFrameCount;
+  const [animation, setAnimation] = useState({
+    name: "idle",
+    frame: 0,
+  });
+  const frame = animation.name === animationName ? animation.frame : 0;
 
   useEffect(() => {
     const interval = setInterval(
       () =>
         setAnimation((currentAnimation) => {
           const currentFrame =
-            currentAnimation.isMoving === isMoving
+            currentAnimation.name === animationName
               ? currentAnimation.frame
               : 0;
 
           return {
-            isMoving,
+            name: animationName,
             frame: (currentFrame + 1) % frameCount,
           };
         }),
-      isMoving ? 90 : 140
+      animationName === "idle" ? 140 : 90
     );
 
     return () => clearInterval(interval);
-  }, [frameCount, isMoving]);
+  }, [animationName, frameCount]);
 
   return (
     <View
@@ -55,7 +75,7 @@ export default function Player({ body }: PlayerProps) {
         ),
       ]}
     >
-      {!isMoving && (
+      {!isMoving && !isJumping && (
         <View style={playerStyles.speechBubble}>
           <Text style={playerStyles.speechText}>
             Necesito concentrarme y llegar a ESFE
@@ -65,7 +85,17 @@ export default function Player({ body }: PlayerProps) {
       )}
       <View style={playerStyles.spriteViewport}>
         <Image
-          source={isMoving ? walkSprite : idleSprite}
+          source={
+            isJumping
+              ? facingLeft.current
+                ? jumpLeftSprite
+                : jumpRightSprite
+              : isMovingLeft
+                ? walkLeftSprite
+                : isMoving
+                  ? walkSprite
+                  : idleSprite
+          }
           resizeMode="stretch"
           style={[
             playerStyles.spriteSheet,
