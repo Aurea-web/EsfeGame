@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { BackHandler, Pressable, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { levelScreenStyles } from "../styles/LevelScreenStyles";
 
@@ -20,6 +20,21 @@ export default function LevelsScreen({ navigation }: any) {
     "El campus",
     "El aula",
   ];
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
+        return true;
+      }
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
 
   return (
     <View style={levelScreenStyles.container}>

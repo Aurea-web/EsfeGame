@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { BackHandler, View } from "react-native";
 import Matter from "matter-js";
 
 import GameScene from "../components/GameScene";
@@ -18,6 +18,21 @@ export default function GameScreen({ navigation }: any) {
   const { engine, player, entities } = game;
   const playerRef = useRef(player);
   const pressedDirections = useRef({ left: false, right: false });
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Levels" }],
+        });
+        return true;
+      }
+    );
+
+    return () => subscription.remove();
+  }, [navigation]);
 
   const setDirectionPressed = (
     direction: "left" | "right",
@@ -98,7 +113,12 @@ export default function GameScreen({ navigation }: any) {
           isPaused={isPaused}
           onPause={pauseGame}
           onResume={() => setIsPaused(false)}
-          onExit={() => navigation.navigate("Levels")}
+          onExit={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Levels" }],
+            })
+          }
           onRestart={restartGame}
         />
       </View>
