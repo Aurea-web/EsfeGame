@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Text, View } from "react-native";
 import type { ReactNode } from "react";
+import type { GestureResponderEvent } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { mobileControlsStyles as styles } from "../styles/MobileControlsStyles";
@@ -29,9 +30,35 @@ function TouchButton({
   children,
 }: TouchButtonProps) {
   const [pressed, setPressed] = useState(false);
+  const activeTouches = useRef(new Set<number>());
+
   const handleAccessibilityTap = () => {
     onPressIn?.();
     onActivate?.();
+    onPressOut?.();
+  };
+
+  const handleTouchStart = (event: GestureResponderEvent) => {
+    const wasPressed = activeTouches.current.size > 0;
+    event.nativeEvent.changedTouches.forEach(({ identifier }) => {
+      activeTouches.current.add(identifier);
+    });
+
+    if (wasPressed) return;
+
+    setPressed(true);
+    onPressIn?.();
+    onActivate?.();
+  };
+
+  const handleTouchEnd = (event: GestureResponderEvent) => {
+    event.nativeEvent.changedTouches.forEach(({ identifier }) => {
+      activeTouches.current.delete(identifier);
+    });
+
+    if (activeTouches.current.size > 0) return;
+
+    setPressed(false);
     onPressOut?.();
   };
 
@@ -41,19 +68,9 @@ function TouchButton({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       onAccessibilityTap={handleAccessibilityTap}
-      onTouchStart={() => {
-        setPressed(true);
-        onPressIn?.();
-        onActivate?.();
-      }}
-      onTouchEnd={() => {
-        setPressed(false);
-        onPressOut?.();
-      }}
-      onTouchCancel={() => {
-        setPressed(false);
-        onPressOut?.();
-      }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
       style={[styles.button, pressed && styles.pressedButton]}
     >
       <LinearGradient

@@ -1,5 +1,6 @@
 import Matter from "matter-js";
 
+const JUMP_VELOCITY = -9;
 const groundContacts = new WeakMap<Matter.Body, Set<string>>();
 
 export const setGroundContact = (
@@ -41,6 +42,6 @@ export const jump = (player: Matter.Body) => {
 
   Matter.Body.setVelocity(player, {
     x: player.velocity.x,
-    y: -8.5,
+    y: JUMP_VELOCITY,
   });
 };

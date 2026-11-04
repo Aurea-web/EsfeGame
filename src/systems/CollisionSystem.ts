@@ -20,6 +20,17 @@ const updateGroundContacts = (
     const surface = player === pair.bodyA ? pair.bodyB : pair.bodyA;
     if (surface.label !== "ground" && surface.label !== "platform") return;
 
+    if (
+      surface.label === "platform" &&
+      player.velocity.y < 0 &&
+      player.position.y > surface.position.y
+    ) {
+      pair.isSensor = true;
+      return;
+    }
+
+    if (pair.isSensor) return;
+
     const normalY =
       player === pair.bodyA
         ? pair.collision.normal.y

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BackHandler, Platform, Text, View } from "react-native";
 import Matter from "matter-js";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAudioPlayer } from "expo-audio";
 import { NavigationBar } from "expo-navigation-bar";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -13,7 +14,15 @@ import { createGameState } from "../services/GameState";
 import { jump, moveLeft, moveRight } from "../services/GameControls";
 import { gameScreenStyles } from "../styles/GameScreenStyles";
 
+type MovementDirection = "left" | "right" | null;
+
 export default function GameScreen({ navigation, route }: any) {
+  const levelMusicPlayer = useAudioPlayer(
+    require("../../levelbackgroundmusic.mpeg")
+  );
+  const pauseSoundPlayer = useAudioPlayer(require("../../menu_pause .mpeg"));
+  const coinSoundPlayer = useAudioPlayer(require("../../coinpickup.mpeg"));
+  const walkingSoundPlayer = useAudioPlayer(require("../../walking.mpeg"));
   const [score, setScore] = useState(0);
   const [game, setGame] = useState(() =>
     createGameState(route.params?.level ?? 1)
@@ -26,6 +35,18 @@ export default function GameScreen({ navigation, route }: any) {
   const scoreRef = useRef(0);
   const winHandledRef = useRef(false);
   const pressedDirections = useRef({ left: false, right: false });
+  const movementDirectionRef = useRef<MovementDirection>(null);
+  const [movementDirection, setMovementDirection] =
+    useState<MovementDirection>(null);
+
+  const playSound = (soundPlayer: ReturnType<typeof useAudioPlayer>) => {
+    void soundPlayer
+      .seekTo(0)
+      .then(() => soundPlayer.play())
+      .catch((error: unknown) => {
+        console.warn("Unable to play a game sound.", error);
+      });
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -61,6 +82,39 @@ export default function GameScreen({ navigation, route }: any) {
     return () => clearInterval(interval);
   }, [isPaused, remainingSeconds]);
 
+  useEffect(() => {
+    // AudioPlayer.loop is a mutable playback setting exposed by expo-audio.
+    // eslint-disable-next-line react-hooks/immutability
+    levelMusicPlayer.loop = true;
+    if (isPaused) {
+      levelMusicPlayer.pause();
+    } else {
+      levelMusicPlayer.play();
+    }
+
+    return () => levelMusicPlayer.pause();
+  }, [isPaused, levelMusicPlayer]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
+    walkingSoundPlayer.loop = true;
+    if (movementDirection && !isPaused) {
+      walkingSoundPlayer.play();
+    } else {
+      walkingSoundPlayer.pause();
+    }
+  }, [isPaused, movementDirection, walkingSoundPlayer]);
+
+  const clearMovement = () => {
+    pressedDirections.current = { left: false, right: false };
+    movementDirectionRef.current = null;
+    setMovementDirection(null);
+    Matter.Body.setVelocity(playerRef.current, {
+      x: 0,
+      y: playerRef.current.velocity.y,
+    });
+  };
+
   const setDirectionPressed = (
     direction: "left" | "right",
     isPressed: boolean
@@ -69,12 +123,22 @@ export default function GameScreen({ navigation, route }: any) {
 
     pressedDirections.current[direction] = isPressed;
 
-    if (pressedDirections.current.left && !pressedDirections.current.right) {
+    if (isPressed) {
+      movementDirectionRef.current = direction;
+    } else if (movementDirectionRef.current === direction) {
+      movementDirectionRef.current = pressedDirections.current.left
+        ? "left"
+        : pressedDirections.current.right
+          ? "right"
+          : null;
+    }
+
+    const nextDirection = movementDirectionRef.current;
+    setMovementDirection(nextDirection);
+
+    if (nextDirection === "left") {
       moveLeft(playerRef.current);
-    } else if (
-      pressedDirections.current.right &&
-      !pressedDirections.current.left
-    ) {
+    } else if (nextDirection === "right") {
       moveRight(playerRef.current);
     } else {
       Matter.Body.setVelocity(playerRef.current, {
@@ -84,29 +148,14 @@ export default function GameScreen({ navigation, route }: any) {
     }
   };
 
-  const getMovementDirection = () => {
-    if (pressedDirections.current.left && !pressedDirections.current.right) {
-      return "left";
-    }
-
-    if (pressedDirections.current.right && !pressedDirections.current.left) {
-      return "right";
-    }
-
-    return null;
-  };
-
   const pauseGame = () => {
-    pressedDirections.current = { left: false, right: false };
-    Matter.Body.setVelocity(playerRef.current, {
-      x: 0,
-      y: playerRef.current.velocity.y,
-    });
+    clearMovement();
+    playSound(pauseSoundPlayer);
     setIsPaused(true);
   };
 
   const restartGame = () => {
-    pressedDirections.current = { left: false, right: false };
+    clearMovement();
     const restartedGame = createGameState(route.params?.level ?? 1);
     playerRef.current = restartedGame.player;
     setGame(restartedGame);
@@ -123,6 +172,7 @@ export default function GameScreen({ navigation, route }: any) {
 
   const handleEvent = (event: { type: string }) => {
     if (event.type === "coin-collected") {
+      playSound(coinSoundPlayer);
       scoreRef.current += 10;
       setScore(scoreRef.current);
     }
@@ -183,14 +233,17 @@ export default function GameScreen({ navigation, route }: any) {
           entities={entities}
           gameKey={gameKey}
           isPaused={isPaused}
-          getMovementDirection={getMovementDirection}
+          getMovementDirection={() => movementDirectionRef.current}
           onEvent={handleEvent}
           level={route.params?.level ?? 1}
         />
         <PauseMenu
           isPaused={isPaused}
           onPause={pauseGame}
-          onResume={() => setIsPaused(false)}
+          onResume={() => {
+            playSound(pauseSoundPlayer);
+            setIsPaused(false);
+          }}
           onExit={() =>
             navigation.reset({
               index: 0,

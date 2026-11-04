@@ -1,7 +1,10 @@
+import { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useAudioPlayer } from "expo-audio";
 import { winScreenStyles as styles } from "../styles/WinScreenStyles";
 
 export default function WinScreen({ navigation, route }: any) {
+  const winSoundPlayer = useAudioPlayer(require("../../winlevel.mpeg"));
   const score = route.params?.score ?? 0;
   const level = route.params?.level ?? 1;
   const concentration = route.params?.concentration ?? 100;
@@ -13,6 +16,10 @@ export default function WinScreen({ navigation, route }: any) {
     styles.pixel4,
     styles.pixel5,
   ];
+
+  useEffect(() => {
+    winSoundPlayer.play();
+  }, [winSoundPlayer]);
 
   return (
     <View style={styles.container}>
