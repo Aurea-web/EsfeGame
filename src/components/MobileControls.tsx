@@ -1,4 +1,6 @@
-import { Pressable, Text, View } from "react-native";
+import { useState } from "react";
+import { Text, View } from "react-native";
+import type { ReactNode } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { mobileControlsStyles as styles } from "../styles/MobileControlsStyles";
@@ -11,6 +13,59 @@ type MobileControlsProps = {
   onMoveRightOut: () => void;
 };
 
+type TouchButtonProps = {
+  accessibilityLabel: string;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
+  onActivate?: () => void;
+  children: ReactNode;
+};
+
+function TouchButton({
+  accessibilityLabel,
+  onPressIn,
+  onPressOut,
+  onActivate,
+  children,
+}: TouchButtonProps) {
+  const [pressed, setPressed] = useState(false);
+  const handleAccessibilityTap = () => {
+    onPressIn?.();
+    onActivate?.();
+    onPressOut?.();
+  };
+
+  return (
+    <View
+      accessible
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      onAccessibilityTap={handleAccessibilityTap}
+      onTouchStart={() => {
+        setPressed(true);
+        onPressIn?.();
+        onActivate?.();
+      }}
+      onTouchEnd={() => {
+        setPressed(false);
+        onPressOut?.();
+      }}
+      onTouchCancel={() => {
+        setPressed(false);
+        onPressOut?.();
+      }}
+      style={[styles.button, pressed && styles.pressedButton]}
+    >
+      <LinearGradient
+        colors={["rgba(0,123,255,0.38)", "rgba(0,207,255,0.38)"]}
+        style={styles.gradientButton}
+      >
+        {children}
+      </LinearGradient>
+    </View>
+  );
+}
+
 export default function MobileControls({
   onMoveLeftIn,
   onMoveLeftOut,
@@ -21,48 +76,27 @@ export default function MobileControls({
   return (
     <View style={styles.container}>
       <View style={styles.movementControls}>
-        <Pressable
-        accessibilityLabel="Correr a la izquierda"
-        accessibilityRole="button"
-        onPressIn={onMoveLeftIn}
-        onPressOut={onMoveLeftOut}
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.pressedButton,
-        ]}
+        <TouchButton
+          accessibilityLabel="Correr a la izquierda"
+          onPressIn={onMoveLeftIn}
+          onPressOut={onMoveLeftOut}
         >
-          <LinearGradient colors={["rgba(0,123,255,0.38)", "rgba(0,207,255,0.38)"]} style={styles.gradientButton}>
-            <Text style={styles.buttonText}>←</Text>
-          </LinearGradient>
-        </Pressable>
-        <Pressable
+          <Text style={styles.buttonText}>←</Text>
+        </TouchButton>
+        <TouchButton
           accessibilityLabel="Correr a la derecha"
-          accessibilityRole="button"
           onPressIn={onMoveRightIn}
           onPressOut={onMoveRightOut}
-          style={({ pressed }) => [
-            styles.button,
-            pressed && styles.pressedButton,
-          ]}
         >
-          <LinearGradient colors={["rgba(0,123,255,0.38)", "rgba(0,207,255,0.38)"]} style={styles.gradientButton}>
-            <Text style={styles.buttonText}>→</Text>
-          </LinearGradient>
-        </Pressable>
+          <Text style={styles.buttonText}>→</Text>
+        </TouchButton>
       </View>
-      <Pressable
+      <TouchButton
         accessibilityLabel="Saltar"
-        accessibilityRole="button"
-        onPressIn={onJump}
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.pressedButton,
-        ]}
+        onActivate={onJump}
       >
-        <LinearGradient colors={["rgba(0,123,255,0.38)", "rgba(0,207,255,0.38)"]} style={styles.gradientButton}>
-          <Text style={styles.buttonText}>↑</Text>
-        </LinearGradient>
-      </Pressable>
+        <Text style={styles.buttonText}>↑</Text>
+      </TouchButton>
     </View>
   );
 }

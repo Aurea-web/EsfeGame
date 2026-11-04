@@ -1,44 +1,46 @@
 import Matter from "matter-js";
 
-export const moveLeft = (
-  player: Matter.Body
+const groundContacts = new WeakMap<Matter.Body, Set<string>>();
+
+export const setGroundContact = (
+  player: Matter.Body,
+  contactId: string,
+  isTouching: boolean
 ) => {
+  let contacts = groundContacts.get(player);
 
-  Matter.Body.setVelocity(
-    player,
-    {
-      x: -8,
-      y: player.velocity.y,
-    }
-  );
+  if (!contacts) {
+    contacts = new Set();
+    groundContacts.set(player, contacts);
+  }
 
+  if (isTouching) {
+    contacts.add(contactId);
+  } else {
+    contacts.delete(contactId);
+    if (contacts.size === 0) groundContacts.delete(player);
+  }
 };
 
-export const moveRight = (
-  player: Matter.Body
-) => {
-
-  Matter.Body.setVelocity(
-    player,
-    {
-      x: 8,
-      y: player.velocity.y,
-    }
-  );
-
+export const moveLeft = (player: Matter.Body) => {
+  Matter.Body.setVelocity(player, {
+    x: -6,
+    y: player.velocity.y,
+  });
 };
 
-export const jump = (
-  player: Matter.Body
-) => {
-  if (Math.abs(player.velocity.y) > 0.75) return;
+export const moveRight = (player: Matter.Body) => {
+  Matter.Body.setVelocity(player, {
+    x: 6,
+    y: player.velocity.y,
+  });
+};
 
-  Matter.Body.setVelocity(
-    player,
-    {
-      x: player.velocity.x,
-      y: -6.5,
-    }
-  );
+export const jump = (player: Matter.Body) => {
+  if (!groundContacts.get(player)?.size || player.velocity.y < -0.75) return;
 
+  Matter.Body.setVelocity(player, {
+    x: player.velocity.x,
+    y: -8.5,
+  });
 };

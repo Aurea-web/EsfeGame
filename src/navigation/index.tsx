@@ -30,6 +30,7 @@ export default function Navigation() {
         <Stack.Screen
           name="Game"
           component={GameScreen}
+          options={{ autoHideHomeIndicator: true }}
         />
 
         <Stack.Screen

@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { BackHandler, Text, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { BackHandler, Platform, Text, View } from "react-native";
 import Matter from "matter-js";
+import { useFocusEffect } from "@react-navigation/native";
+import { NavigationBar } from "expo-navigation-bar";
 import { LinearGradient } from "expo-linear-gradient";
 
 import GameScene from "../components/GameScene";
@@ -24,6 +26,15 @@ export default function GameScreen({ navigation, route }: any) {
   const scoreRef = useRef(0);
   const winHandledRef = useRef(false);
   const pressedDirections = useRef({ left: false, right: false });
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== "android") return;
+
+      NavigationBar.setHidden(true);
+      return () => NavigationBar.setHidden(false);
+    }, [])
+  );
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener(

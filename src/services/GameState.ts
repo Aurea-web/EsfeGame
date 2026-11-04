@@ -20,14 +20,14 @@ export type GameState = {
 export const createGameState = (level = 1): GameState => {
   const engine = Matter.Engine.create();
   const world = engine.world;
-  engine.gravity.y = 1.15;
+  engine.gravity.y = 1.5;
   engine.gravity.scale = 0.001;
 
   const player = Matter.Bodies.rectangle(100, groundY - 59, 58, 58, {
     friction: 0.05,
     frictionAir: 0.005,
     frictionStatic: 0,
-    restitution: 0.05,
+    restitution: 0,
   });
   player.label = "player";
 
@@ -36,8 +36,9 @@ export const createGameState = (level = 1): GameState => {
     groundY,
     worldWidth,
     58,
-    { isStatic: true, restitution: 0.12 }
+    { isStatic: true, restitution: 0 }
   );
+  ground.label = "ground";
   const platformPositions = Array.from({ length: 10 }, (_, index) =>
     170 + ((worldWidth - 340) / 9) * index
   );
@@ -48,8 +49,9 @@ export const createGameState = (level = 1): GameState => {
       groundY - platformHeights[index],
       150,
       20,
-      { isStatic: true, restitution: 0.12 }
+      { isStatic: true, restitution: 0 }
     );
+    platform.label = "platform";
     const coin = Matter.Bodies.circle(x, platform.position.y - 35, 10, {
       isStatic: true,
       isSensor: true,
@@ -74,8 +76,9 @@ export const createGameState = (level = 1): GameState => {
             groundY - heightAboveGround,
             platformWidth,
             20,
-            { isStatic: true, restitution: 0.12 }
+            { isStatic: true, restitution: 0 }
           );
+          platform.label = "platform";
           const coin = Matter.Bodies.circle(x, platform.position.y - 38, 10, {
             isStatic: true,
             isSensor: true,

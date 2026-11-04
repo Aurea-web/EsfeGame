@@ -1,7 +1,35 @@
 // src/systems/CollisionSystem.ts
 import Matter from "matter-js";
+import { setGroundContact } from "../services/GameControls";
 
 const initializedEngines = new WeakSet<Matter.Engine>();
+
+const updateGroundContacts = (
+  pairs: Matter.Pair[],
+  isTouching: boolean
+) => {
+  pairs.forEach((pair) => {
+    const player =
+      pair.bodyA.label === "player"
+        ? pair.bodyA
+        : pair.bodyB.label === "player"
+          ? pair.bodyB
+          : null;
+    if (!player) return;
+
+    const surface = player === pair.bodyA ? pair.bodyB : pair.bodyA;
+    if (surface.label !== "ground" && surface.label !== "platform") return;
+
+    const normalY =
+      player === pair.bodyA
+        ? pair.collision.normal.y
+        : -pair.collision.normal.y;
+
+    if (normalY < -0.5) {
+      setGroundContact(player, pair.id, isTouching);
+    }
+  });
+};
 
 const CollisionSystem = (
   entities: any,
@@ -13,6 +41,26 @@ const CollisionSystem = (
   if (!engine || !world) return entities;
 
   if (!initializedEngines.has(engine)) {
+    Matter.Events.on(
+      engine,
+      "collisionStart",
+      (event) => {
+        updateGroundContacts(
+          (event as Matter.IEventCollision<Matter.Engine>).pairs,
+          true
+        );
+      }
+    );
+    Matter.Events.on(
+      engine,
+      "collisionEnd",
+      (event) => {
+        updateGroundContacts(
+          (event as Matter.IEventCollision<Matter.Engine>).pairs,
+          false
+        );
+      }
+    );
     Matter.Events.on(
       engine,
       "collisionStart",
