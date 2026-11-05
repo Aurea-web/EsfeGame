@@ -56,6 +56,17 @@ export const winScreenStyles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
+  progressMessage: {
+    marginBottom: 10,
+    color: "#A7F3D0",
+    fontFamily: "Fredoka",
+    fontSize: 15,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  progressError: {
+    color: "#FDBA74",
+  },
   button: {
     width: "70%",
     maxWidth: 360,
@@ -81,6 +92,20 @@ export const winScreenStyles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 12,
     elevation: 10,
+  },
+  retryButton: {
+    minHeight: 48,
+    marginBottom: 8,
+    paddingHorizontal: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#FDBA74",
+    borderRadius: 9,
+    backgroundColor: "#7C2D12",
+  },
+  disabledButton: {
+    opacity: 0.55,
   },
   pressedButton: {
     transform: [{ scale: 0.97 }],
