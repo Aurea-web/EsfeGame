@@ -58,8 +58,11 @@ export default function GameScene({
             Math.max(time.delta || MAX_PHYSICS_STEP_MS, 1),
             MAX_PHYSICS_STEP_MS
           );
-          const enemy = currentEntities.enemy;
-          if (enemy?.body) {
+          Object.values(currentEntities).forEach((enemy: any) => {
+            if (!enemy?.body || typeof enemy.patrolDirection !== "number") {
+              return;
+            }
+
             const distance =
               (ENEMY_FLOAT_SPEED * delta) / 1000 * enemy.patrolDirection;
             let nextY = enemy.body.position.y + distance;
@@ -76,7 +79,7 @@ export default function GameScene({
               x: enemy.body.position.x,
               y: nextY,
             });
-          }
+          });
 
           Matter.Engine.update(
             engine,

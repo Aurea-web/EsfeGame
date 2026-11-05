@@ -18,10 +18,16 @@ const updateGroundContacts = (
     if (!player) return;
 
     const surface = player === pair.bodyA ? pair.bodyB : pair.bodyA;
-    if (surface.label !== "ground" && surface.label !== "platform") return;
+    if (
+      surface.label !== "ground" &&
+      surface.label !== "platform" &&
+      surface.label !== "enemy"
+    ) {
+      return;
+    }
 
     if (
-      surface.label === "platform" &&
+      (surface.label === "platform" || surface.label === "enemy") &&
       player.velocity.y < 0 &&
       player.position.y > surface.position.y
     ) {
@@ -111,9 +117,22 @@ const CollisionSystem = (
             labels.includes("player") &&
             labels.includes("enemy")
           ) {
-            dispatch({
-              type: "enemy-hit",
-            });
+            const player = bodyA.label === "player" ? bodyA : bodyB;
+            const enemy = bodyA.label === "enemy" ? bodyA : bodyB;
+            const normalY =
+              player === bodyA
+                ? pair.collision.normal.y
+                : -pair.collision.normal.y;
+            const landedOnBed = normalY < -0.5;
+            const jumpingUpThroughBed =
+              player.velocity.y < 0 &&
+              player.position.y > enemy.position.y;
+
+            if (!landedOnBed && !jumpingUpThroughBed) {
+              dispatch({
+                type: "enemy-hit",
+              });
+            }
           }
         });
       }

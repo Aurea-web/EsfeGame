@@ -1,7 +1,6 @@
 import { Dimensions } from "react-native";
 import Matter from "matter-js";
 
-import BedPlatform from "../entities/BedPlatform";
 import Coin from "../entities/Coin";
 import Door from "../entities/Door";
 import Enemy from "../entities/Enemy";
@@ -12,6 +11,10 @@ const { width, height } = Dimensions.get("window");
 export const worldWidth = Math.max(width * 3, width + 600);
 export const worldHeight = Math.max(height * 1.35, 420);
 const groundY = worldHeight - 58;
+const enemyPlatformIndexes = new Set([1, 4, 7]);
+const enemyPatrolDistance = 40;
+const maxPlatformGap = 160;
+const maxPlatformHeightStep = 40;
 
 export type GameState = {
   engine: Matter.Engine;
@@ -46,22 +49,69 @@ export const createGameState = (level = 1): GameState => {
   );
   const platformHeights = [105, 155, 125, 180, 145, 195, 160, 210, 175, 225];
   const platforms = platformPositions.map((x, index) => {
+    const isEnemyBed = enemyPlatformIndexes.has(index);
     const platform = Matter.Bodies.rectangle(
       x,
       groundY - platformHeights[index],
-      150,
-      20,
+      isEnemyBed ? 90 : 150,
+      isEnemyBed ? 64 : 20,
       { isStatic: true, restitution: 0 }
     );
-    platform.label = "platform";
+    platform.label = isEnemyBed ? "enemy" : "platform";
     const coin = Matter.Bodies.circle(x, platform.position.y - 35, 10, {
       isStatic: true,
       isSensor: true,
     });
     coin.label = "coin";
 
-    return { platform, coin };
+    return { platform, coin, isEnemyBed };
   });
+  const createAccessPlatforms = (
+    startX: number,
+    endX: number,
+    startTopHeight: number,
+    endTopHeight: number
+  ) => {
+    const segmentLength = endX - startX;
+    const stepCount = Math.max(
+      Math.ceil(segmentLength / maxPlatformGap),
+      Math.ceil(Math.abs(endTopHeight - startTopHeight) / maxPlatformHeightStep)
+    );
+
+    return Array.from({ length: stepCount - 1 }, (_, stepIndex) => {
+      const progress = (stepIndex + 1) / stepCount;
+      const platform = Matter.Bodies.rectangle(
+        startX + segmentLength * progress,
+        groundY -
+          (startTopHeight +
+            (endTopHeight - startTopHeight) * progress -
+            10),
+        130,
+        20,
+        { isStatic: true, restitution: 0 }
+      );
+      platform.label = "platform";
+      return { platform };
+    });
+  };
+  const accessPlatforms = platformPositions
+    .slice(1)
+    .flatMap((x, segmentIndex) => {
+      const previousIndex = segmentIndex;
+      const previousTopHeight =
+        platformHeights[previousIndex] +
+        (enemyPlatformIndexes.has(previousIndex) ? 32 : 10);
+      const nextTopHeight =
+        platformHeights[previousIndex + 1] +
+        (enemyPlatformIndexes.has(previousIndex + 1) ? 32 : 10);
+
+      return createAccessPlatforms(
+        platformPositions[previousIndex],
+        x,
+        previousTopHeight,
+        nextTopHeight
+      );
+    });
 
   const parkourPlatforms =
     level === 1
@@ -89,6 +139,18 @@ export const createGameState = (level = 1): GameState => {
           return { platform, coin, index };
         })
       : [];
+  const parkourAccessPlatforms = parkourPlatforms
+    .slice(1)
+    .flatMap(({ platform }, index) => {
+      const previousPlatform = parkourPlatforms[index].platform;
+
+      return createAccessPlatforms(
+        previousPlatform.position.x,
+        platform.position.x,
+        groundY - previousPlatform.bounds.min.y,
+        groundY - platform.bounds.min.y
+      );
+    });
   const lastPlatform = platforms[platforms.length - 1].platform;
   const door = Matter.Bodies.rectangle(
     lastPlatform.position.x,
@@ -101,20 +163,6 @@ export const createGameState = (level = 1): GameState => {
     }
   );
   door.label = "door";
-  const enemyPatrolMinY = groundY - 250;
-  const enemyPatrolMaxY = groundY - 170;
-  const enemy = Matter.Bodies.rectangle(
-    worldWidth * 0.39,
-    enemyPatrolMinY,
-    90,
-    64,
-    {
-      isStatic: true,
-      isSensor: true,
-    }
-  );
-  enemy.label = "enemy";
-
   const sideWalls = [
     Matter.Bodies.rectangle(-20, worldHeight / 2, 40, worldHeight, {
       isStatic: true,
@@ -132,7 +180,8 @@ export const createGameState = (level = 1): GameState => {
     player,
     ground,
     door,
-    enemy,
+    ...accessPlatforms.map(({ platform }) => platform),
+    ...parkourAccessPlatforms.map(({ platform }) => platform),
     ...parkourPlatforms.map(({ platform }) => platform),
     ...parkourPlatforms.map(({ coin }) => coin),
     ...sideWalls,
@@ -144,23 +193,40 @@ export const createGameState = (level = 1): GameState => {
     player: { body: player, renderer: Player },
     ground: { body: ground, renderer: Ground },
     door: { body: door, renderer: Door },
-    enemy: {
-      body: enemy,
-      renderer: Enemy,
-      patrolMinY: enemyPatrolMinY,
-      patrolMaxY: enemyPatrolMaxY,
-      patrolDirection: 1,
-    },
   };
 
-  platforms.forEach(({ platform, coin }, index) => {
-    entities[`platform${index + 1}`] = {
-      body: platform,
-      renderer: [1, 4, 7].includes(index) ? BedPlatform : Ground,
-    };
+  platforms.forEach(({ platform, coin, isEnemyBed }, index) => {
+    if (isEnemyBed) {
+      entities[`enemy${index + 1}`] = {
+        body: platform,
+        renderer: Enemy,
+        patrolMinY: platform.position.y - enemyPatrolDistance,
+        patrolMaxY: platform.position.y + enemyPatrolDistance,
+        patrolDirection: 1,
+      };
+    } else {
+      entities[`platform${index + 1}`] = {
+        body: platform,
+        renderer: Ground,
+      };
+    }
     entities[`coin${index + 1}`] = {
       body: coin,
       renderer: Coin,
+    };
+  });
+
+  accessPlatforms.forEach(({ platform }, index) => {
+    entities[`accessPlatform${index + 1}`] = {
+      body: platform,
+      renderer: Ground,
+    };
+  });
+
+  parkourAccessPlatforms.forEach(({ platform }, index) => {
+    entities[`parkourAccessPlatform${index + 1}`] = {
+      body: platform,
+      renderer: Ground,
     };
   });
 
