@@ -18,11 +18,17 @@ type MovementDirection = "left" | "right" | null;
 
 export default function GameScreen({ navigation, route }: any) {
   const levelMusicPlayer = useAudioPlayer(
-    require("../../levelbackgroundmusic.mpeg")
+    require("../../assets/levelbackgroundmusic.mpeg")
   );
-  const pauseSoundPlayer = useAudioPlayer(require("../../menu_pause .mpeg"));
-  const coinSoundPlayer = useAudioPlayer(require("../../coinpickup.mpeg"));
-  const walkingSoundPlayer = useAudioPlayer(require("../../walking.mpeg"));
+  const pauseSoundPlayer = useAudioPlayer(
+    require("../../assets/menu_pause .mpeg")
+  );
+  const coinSoundPlayer = useAudioPlayer(
+    require("../../assets/coinpickup.mpeg")
+  );
+  const walkingSoundPlayer = useAudioPlayer(
+    require("../../assets/walking.mpeg")
+  );
   const [score, setScore] = useState(0);
   const [game, setGame] = useState(() =>
     createGameState(route.params?.level ?? 1)

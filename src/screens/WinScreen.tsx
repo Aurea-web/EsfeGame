@@ -4,7 +4,9 @@ import { useAudioPlayer } from "expo-audio";
 import { winScreenStyles as styles } from "../styles/WinScreenStyles";
 
 export default function WinScreen({ navigation, route }: any) {
-  const winSoundPlayer = useAudioPlayer(require("../../winlevel.mpeg"));
+  const winSoundPlayer = useAudioPlayer(
+    require("../../assets/winlevel.mpeg")
+  );
   const score = route.params?.score ?? 0;
   const level = route.params?.level ?? 1;
   const concentration = route.params?.concentration ?? 100;
