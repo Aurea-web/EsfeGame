@@ -39,7 +39,7 @@ export default function GameScreen({ navigation, route }: any) {
   const { engine, player, entities } = game;
   const playerRef = useRef(player);
   const scoreRef = useRef(0);
-  const winHandledRef = useRef(false);
+  const gameEndedRef = useRef(false);
   const pressedDirections = useRef({ left: false, right: false });
   const movementDirectionRef = useRef<MovementDirection>(null);
   const [movementDirection, setMovementDirection] =
@@ -111,7 +111,7 @@ export default function GameScreen({ navigation, route }: any) {
     }
   }, [isPaused, movementDirection, walkingSoundPlayer]);
 
-  const clearMovement = () => {
+  const clearMovement = useCallback(() => {
     pressedDirections.current = { left: false, right: false };
     movementDirectionRef.current = null;
     setMovementDirection(null);
@@ -119,7 +119,7 @@ export default function GameScreen({ navigation, route }: any) {
       x: 0,
       y: playerRef.current.velocity.y,
     });
-  };
+  }, []);
 
   const setDirectionPressed = (
     direction: "left" | "right",
@@ -168,7 +168,7 @@ export default function GameScreen({ navigation, route }: any) {
     setGameKey((key) => key + 1);
     setScore(0);
     scoreRef.current = 0;
-    winHandledRef.current = false;
+    gameEndedRef.current = false;
     setIsPaused(false);
     setRemainingSeconds(120);
   };
@@ -176,14 +176,27 @@ export default function GameScreen({ navigation, route }: any) {
   const elapsedRatio = (120 - remainingSeconds) / 120;
   const concentration = Math.max(0, 100 - Math.round(elapsedRatio * 100));
 
+  useEffect(() => {
+    if (remainingSeconds > 0 || gameEndedRef.current) return;
+
+    gameEndedRef.current = true;
+    clearMovement();
+    setIsPaused(true);
+    navigation.replace("Lose", {
+      score: scoreRef.current,
+      level: route.params?.level ?? 1,
+    });
+  }, [clearMovement, navigation, remainingSeconds, route.params?.level]);
+
   const handleEvent = (event: { type: string }) => {
     if (event.type === "coin-collected") {
       playSound(coinSoundPlayer);
       scoreRef.current += 10;
       setScore(scoreRef.current);
     }
-    if (event.type === "win" && !winHandledRef.current) {
-      winHandledRef.current = true;
+    if (event.type === "win" && !gameEndedRef.current) {
+      gameEndedRef.current = true;
+      clearMovement();
       setIsPaused(true);
       navigation.replace("Win", {
         score: scoreRef.current,
