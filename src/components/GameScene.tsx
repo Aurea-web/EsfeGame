@@ -7,6 +7,7 @@ import { gameScreenStyles } from "../styles/GameScreenStyles";
 import GameWorldRenderer from "./GameWorldRenderer";
 
 const MAX_PHYSICS_STEP_MS = 16.6;
+const ENEMY_FLOAT_SPEED = 75;
 
 type MovementDirection = "left" | "right" | null;
 
@@ -53,9 +54,33 @@ export default function GameScene({
             });
           }
 
+          const delta = Math.min(
+            Math.max(time.delta || MAX_PHYSICS_STEP_MS, 1),
+            MAX_PHYSICS_STEP_MS
+          );
+          const enemy = currentEntities.enemy;
+          if (enemy?.body) {
+            const distance =
+              (ENEMY_FLOAT_SPEED * delta) / 1000 * enemy.patrolDirection;
+            let nextY = enemy.body.position.y + distance;
+
+            if (nextY <= enemy.patrolMinY) {
+              nextY = enemy.patrolMinY;
+              enemy.patrolDirection = 1;
+            } else if (nextY >= enemy.patrolMaxY) {
+              nextY = enemy.patrolMaxY;
+              enemy.patrolDirection = -1;
+            }
+
+            Matter.Body.setPosition(enemy.body, {
+              x: enemy.body.position.x,
+              y: nextY,
+            });
+          }
+
           Matter.Engine.update(
             engine,
-            Math.min(Math.max(time.delta || MAX_PHYSICS_STEP_MS, 1), MAX_PHYSICS_STEP_MS)
+            delta
           );
           return currentEntities;
         },

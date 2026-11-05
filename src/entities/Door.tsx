@@ -1,21 +1,22 @@
-// src/entities/Door.tsx
+import { Image } from "react-native";
+import Matter from "matter-js";
 
-import React from "react";
-import { View } from "react-native";
+type DoorProps = {
+  body: Matter.Body;
+};
 
-export default function Door({
-  body,
-}: any) {
-
+export default function Door({ body }: DoorProps) {
   return (
-    <View
+    <Image
+      accessibilityLabel="Puerta de salida"
+      source={require("../../assets/puertanivel.png")}
+      resizeMode="stretch"
       style={{
         position: "absolute",
-        width: 50,
-        height: 80,
-        backgroundColor: "green",
-        left: body.position.x - 25,
-        top: body.position.y - 40,
+        width: 76,
+        height: 96,
+        left: body.position.x - 38,
+        top: body.position.y - 48,
       }}
     />
   );

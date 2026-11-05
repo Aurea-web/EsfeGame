@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BackHandler, Platform, Text, View } from "react-native";
+import { BackHandler, Text, View } from "react-native";
 import Matter from "matter-js";
-import { useFocusEffect } from "@react-navigation/native";
 import { useAudioPlayer } from "expo-audio";
-import { NavigationBar } from "expo-navigation-bar";
 import { LinearGradient } from "expo-linear-gradient";
 
 import GameScene from "../components/GameScene";
@@ -53,15 +51,6 @@ export default function GameScreen({ navigation, route }: any) {
         console.warn("Unable to play a game sound.", error);
       });
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      if (Platform.OS !== "android") return;
-
-      NavigationBar.setHidden(true);
-      return () => NavigationBar.setHidden(false);
-    }, [])
-  );
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener(
@@ -193,6 +182,15 @@ export default function GameScreen({ navigation, route }: any) {
       playSound(coinSoundPlayer);
       scoreRef.current += 10;
       setScore(scoreRef.current);
+    }
+    if (event.type === "enemy-hit" && !gameEndedRef.current) {
+      gameEndedRef.current = true;
+      clearMovement();
+      setIsPaused(true);
+      navigation.replace("Lose", {
+        score: scoreRef.current,
+        level: route.params?.level ?? 1,
+      });
     }
     if (event.type === "win" && !gameEndedRef.current) {
       gameEndedRef.current = true;

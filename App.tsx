@@ -2,8 +2,9 @@ import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import { setAudioModeAsync } from "expo-audio";
 import * as ScreenOrientation from "expo-screen-orientation";
+import { NavigationBar } from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import Navigation from "./src/navigation";
 
 export default function App() {
@@ -20,6 +21,21 @@ export default function App() {
     ).catch(() => {
       console.warn("No se pudo bloquear la orientación horizontal.");
     });
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+
+    const hideNavigationBar = () => NavigationBar.setHidden(true);
+    hideNavigationBar();
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") hideNavigationBar();
+    });
+
+    return () => {
+      subscription.remove();
+      NavigationBar.setHidden(false);
+    };
   }, []);
 
   useEffect(() => {

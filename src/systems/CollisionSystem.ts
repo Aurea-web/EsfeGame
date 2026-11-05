@@ -106,6 +106,15 @@ const CollisionSystem = (
               type: "win",
             });
           }
+
+          if (
+            labels.includes("player") &&
+            labels.includes("enemy")
+          ) {
+            dispatch({
+              type: "enemy-hit",
+            });
+          }
         });
       }
     );

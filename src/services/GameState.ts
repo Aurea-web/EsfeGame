@@ -1,8 +1,10 @@
 import { Dimensions } from "react-native";
 import Matter from "matter-js";
 
+import BedPlatform from "../entities/BedPlatform";
 import Coin from "../entities/Coin";
 import Door from "../entities/Door";
+import Enemy from "../entities/Enemy";
 import Ground from "../entities/Ground";
 import Player from "../entities/Player";
 
@@ -99,6 +101,19 @@ export const createGameState = (level = 1): GameState => {
     }
   );
   door.label = "door";
+  const enemyPatrolMinY = groundY - 250;
+  const enemyPatrolMaxY = groundY - 170;
+  const enemy = Matter.Bodies.rectangle(
+    worldWidth * 0.39,
+    enemyPatrolMinY,
+    90,
+    64,
+    {
+      isStatic: true,
+      isSensor: true,
+    }
+  );
+  enemy.label = "enemy";
 
   const sideWalls = [
     Matter.Bodies.rectangle(-20, worldHeight / 2, 40, worldHeight, {
@@ -117,6 +132,7 @@ export const createGameState = (level = 1): GameState => {
     player,
     ground,
     door,
+    enemy,
     ...parkourPlatforms.map(({ platform }) => platform),
     ...parkourPlatforms.map(({ coin }) => coin),
     ...sideWalls,
@@ -128,12 +144,19 @@ export const createGameState = (level = 1): GameState => {
     player: { body: player, renderer: Player },
     ground: { body: ground, renderer: Ground },
     door: { body: door, renderer: Door },
+    enemy: {
+      body: enemy,
+      renderer: Enemy,
+      patrolMinY: enemyPatrolMinY,
+      patrolMaxY: enemyPatrolMaxY,
+      patrolDirection: 1,
+    },
   };
 
   platforms.forEach(({ platform, coin }, index) => {
     entities[`platform${index + 1}`] = {
       body: platform,
-      renderer: Ground,
+      renderer: [1, 4, 7].includes(index) ? BedPlatform : Ground,
     };
     entities[`coin${index + 1}`] = {
       body: coin,
