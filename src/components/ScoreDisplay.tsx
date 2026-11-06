@@ -1,4 +1,4 @@
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 
 import { gameScreenStyles } from "../styles/GameScreenStyles";
 
@@ -7,5 +7,10 @@ type ScoreDisplayProps = {
 };
 
 export default function ScoreDisplay({ score }: ScoreDisplayProps) {
-  return <Text style={gameScreenStyles.score}>Puntos: {score}</Text>;
+  return (
+    <View style={gameScreenStyles.scoreContainer}>
+      <Text style={gameScreenStyles.scoreLabel}>Puntos</Text>
+      <Text style={gameScreenStyles.scoreValue}>{score}</Text>
+    </View>
+  );
 }
