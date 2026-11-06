@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import HomeScreen from "../screens/HomeScreen";
 import LevelScreen from "../screens/LevelScreen";
+import CharacterSelectScreen from "../screens/CharacterSelectScreen";
 import GameScreen from "../screens/GameScreen";
 import WinScreen from "../screens/WinScreen";
 import LoseScreen from "../screens/LoseScreen";
@@ -25,6 +26,11 @@ export default function Navigation() {
         <Stack.Screen
           name="Levels"
           component={LevelScreen}
+        />
+
+        <Stack.Screen
+          name="CharacterSelect"
+          component={CharacterSelectScreen}
         />
 
         <Stack.Screen

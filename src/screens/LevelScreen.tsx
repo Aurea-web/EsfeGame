@@ -117,7 +117,7 @@ export default function LevelsScreen({ navigation }: any) {
                     accessibilityState={{ disabled: !unlocked }}
                     disabled={!unlocked}
                     onPress={() =>
-                      navigation.navigate("Game", {
+                      navigation.navigate("CharacterSelect", {
                         level: levelNumber,
                         title: level,
                       })

@@ -78,6 +78,7 @@ export default function LoseScreen({ navigation, route }: any) {
           onPress={() =>
             navigation.replace("Game", {
               level,
+              character: route.params?.character,
             })
           }
           style={({ pressed }) => [

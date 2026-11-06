@@ -168,6 +168,7 @@ export default function WinScreen({ navigation, route }: any) {
               navigation.replace("Game", {
                 level: level + 1,
                 title: LEVELS[level],
+                character: route.params?.character,
               })
             }
             style={({ pressed }) => [

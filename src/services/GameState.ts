@@ -190,7 +190,7 @@ export const createGameState = (level = 1): GameState => {
 
   const entities: Record<string, any> = {
     physics: { engine, world },
-    player: { body: player, renderer: Player },
+    player: { body: player, renderer: Player, facingLeft: false },
     ground: { body: ground, renderer: Ground },
     door: { body: door, renderer: Door },
   };

@@ -6,12 +6,14 @@ import {
   gameScreenStyles,
   getWorldContentStyle,
 } from "../styles/GameScreenStyles";
+import { PlayerCharacter } from "../entities/PlayerSprites";
 
 export default function GameWorldRenderer(
   entities: Record<string, any> | null,
   screen: any,
   layout: any,
-  level: number
+  level: number,
+  character: PlayerCharacter = "female"
 ) {
   if (!entities?.player || !layout) return null;
 
@@ -61,6 +63,9 @@ export default function GameWorldRenderer(
               screen,
               layout,
               ...entity,
+              ...(key === "player"
+                ? { character, facingLeft: entity.facingLeft }
+                : {}),
             });
           })}
       </View>

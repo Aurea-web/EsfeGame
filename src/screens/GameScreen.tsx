@@ -15,6 +15,8 @@ import { gameScreenStyles } from "../styles/GameScreenStyles";
 type MovementDirection = "left" | "right" | null;
 
 export default function GameScreen({ navigation, route }: any) {
+  const character = route.params?.character === "male" ? "male" : "female";
+  const level = route.params?.level ?? 1;
   const levelMusicPlayer = useAudioPlayer(
     require("../../assets/levelbackgroundmusic.mpeg")
   );
@@ -29,7 +31,7 @@ export default function GameScreen({ navigation, route }: any) {
   );
   const [score, setScore] = useState(0);
   const [game, setGame] = useState(() =>
-    createGameState(route.params?.level ?? 1)
+    createGameState(level)
   );
   const [gameKey, setGameKey] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -151,7 +153,7 @@ export default function GameScreen({ navigation, route }: any) {
 
   const restartGame = () => {
     clearMovement();
-    const restartedGame = createGameState(route.params?.level ?? 1);
+    const restartedGame = createGameState(level);
     playerRef.current = restartedGame.player;
     setGame(restartedGame);
     setGameKey((key) => key + 1);
@@ -173,9 +175,10 @@ export default function GameScreen({ navigation, route }: any) {
     setIsPaused(true);
     navigation.replace("Lose", {
       score: scoreRef.current,
-      level: route.params?.level ?? 1,
+      level,
+      character,
     });
-  }, [clearMovement, navigation, remainingSeconds, route.params?.level]);
+  }, [character, clearMovement, level, navigation, remainingSeconds]);
 
   const handleEvent = (event: { type: string }) => {
     if (event.type === "coin-collected") {
@@ -189,7 +192,8 @@ export default function GameScreen({ navigation, route }: any) {
       setIsPaused(true);
       navigation.replace("Lose", {
         score: scoreRef.current,
-        level: route.params?.level ?? 1,
+        level,
+        character,
       });
     }
     if (event.type === "win" && !gameEndedRef.current) {
@@ -199,7 +203,8 @@ export default function GameScreen({ navigation, route }: any) {
       navigation.replace("Win", {
         score: scoreRef.current,
         concentration,
-        level: route.params?.level ?? 1,
+        level,
+        character,
       });
     }
   };
@@ -252,7 +257,8 @@ export default function GameScreen({ navigation, route }: any) {
           isPaused={isPaused}
           getMovementDirection={() => movementDirectionRef.current}
           onEvent={handleEvent}
-          level={route.params?.level ?? 1}
+          character={character}
+          level={level}
         />
         <PauseMenu
           isPaused={isPaused}

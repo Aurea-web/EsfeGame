@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, Text, View } from "react-native";
 import Matter from "matter-js";
 
@@ -8,37 +8,36 @@ import {
   playerFrameSize,
   playerStyles,
 } from "../styles/PlayerStyles";
+import { PlayerCharacter, playerSprites } from "./PlayerSprites";
 
-const walkSprite = require("../../assets/Walk.png");
-const walkLeftSprite = require("../../assets/Walk_izquierda.png");
-const jumpRightSprite = require("../../assets/Salto_Femenino_Derecha.png");
-const jumpLeftSprite = require("../../assets/Salto_Femenino_Izquierda.png");
-const idleSprite = require("../../assets/Idle.png");
-const walkFrameCount = 12;
-const idleFrameCount = 9;
 const movementThreshold = 0.1;
 const jumpThreshold = 0.75;
 
 type PlayerProps = {
   body: Matter.Body;
+  character?: PlayerCharacter;
+  facingLeft?: boolean;
 };
 
-export default function Player({ body }: PlayerProps) {
+export default function Player({
+  body,
+  character = "female",
+  facingLeft = false,
+}: PlayerProps) {
+  const sprites = playerSprites[character];
   const isMoving = Math.abs(body.velocity.x) > movementThreshold;
   const isMovingLeft = body.velocity.x < -movementThreshold;
   const isJumping = Math.abs(body.velocity.y) > jumpThreshold;
-  const facingLeft = useRef(false);
-
-  if (isMovingLeft) facingLeft.current = true;
-  if (body.velocity.x > movementThreshold) facingLeft.current = false;
+  const isFacingLeft =
+    isMovingLeft || (!isMoving && facingLeft);
 
   const animationName = isJumping ? "jump" : isMoving ? "walk" : "idle";
   const frameCount =
     animationName === "walk"
-      ? walkFrameCount
+      ? sprites.walkFrameCount
       : animationName === "jump"
-        ? walkFrameCount
-        : idleFrameCount;
+        ? sprites.jumpFrameCount
+        : sprites.idleFrameCount;
   const [animation, setAnimation] = useState({
     name: "idle",
     frame: 0,
@@ -87,14 +86,14 @@ export default function Player({ body }: PlayerProps) {
         <Image
           source={
             isJumping
-              ? facingLeft.current
-                ? jumpLeftSprite
-                : jumpRightSprite
+              ? isFacingLeft
+                ? sprites.jumpLeft
+                : sprites.jumpRight
               : isMovingLeft
-                ? walkLeftSprite
+                ? sprites.walkLeft
                 : isMoving
-                  ? walkSprite
-                  : idleSprite
+                  ? sprites.walkRight
+                  : sprites.idle
           }
           resizeMode="stretch"
           style={[

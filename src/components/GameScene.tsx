@@ -3,6 +3,7 @@ import { GameEngine } from "react-native-game-engine";
 
 import { moveLeft, moveRight } from "../services/GameControls";
 import CollisionSystem from "../systems/CollisionSystem";
+import { PlayerCharacter } from "../entities/PlayerSprites";
 import { gameScreenStyles } from "../styles/GameScreenStyles";
 import GameWorldRenderer from "./GameWorldRenderer";
 
@@ -18,6 +19,7 @@ type GameSceneProps = {
   isPaused: boolean;
   getMovementDirection: () => MovementDirection;
   onEvent: (event: { type: string }) => void;
+  character?: PlayerCharacter;
   level?: number;
 };
 
@@ -28,6 +30,7 @@ export default function GameScene({
   isPaused,
   getMovementDirection,
   onEvent,
+  character = "female",
   level = 1,
 }: GameSceneProps) {
   return (
@@ -36,16 +39,19 @@ export default function GameScene({
       style={gameScreenStyles.engine}
       running={!isPaused}
       renderer={(entities: Record<string, any>, screen: any, layout: any) =>
-        GameWorldRenderer(entities, screen, layout, level)
+        GameWorldRenderer(entities, screen, layout, level, character)
       }
       systems={[
         (currentEntities: any, { time }: any) => {
-          const player = currentEntities.player?.body as Matter.Body | undefined;
+          const playerEntity = currentEntities.player;
+          const player = playerEntity?.body as Matter.Body | undefined;
           const direction = getMovementDirection();
 
           if (player && direction === "left") {
+            playerEntity.facingLeft = true;
             moveLeft(player);
           } else if (player && direction === "right") {
+            playerEntity.facingLeft = false;
             moveRight(player);
           } else if (player) {
             Matter.Body.setVelocity(player, {
