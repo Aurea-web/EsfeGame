@@ -49,7 +49,7 @@ Game controls and screen UI are implemented in React Native components rather th
 
 ## Entry 05 — Scenery, art, and sound
 
-- Level 1 uses [`assets/La cama.jpg`](./assets/La%20cama.jpg) as its background; platform and ground surfaces use [`assets/SueloPrincipalPixel.png`](./assets/SueloPrincipalPixel.png).
+- Level 1 uses [`assets/La cama.jpg`](./assets/La%20cama.jpg) and level 2 uses [`assets/level2bus.jpeg`](./assets/level2bus.jpeg) as their backgrounds; platform and ground surfaces use [`assets/SueloPrincipalPixel.png`](./assets/SueloPrincipalPixel.png).
 - Player animation assets: the female sprite set (`Idle.png`, `Walk.png`, `Walk_izquierda.png`, and both `Salto_Femenino_*.png` sheets) and the male sprite set (`Male_Idle.png`, `Male_Walk*.png`, and both `Male_Jump_*.png` sheets).
 - The three floating-bed enemies use `assets/camaflotante.png`.
 - Other visual assets include the app icons, splash icon, favicon, and `assets/fonts/Fredoka.ttf` / `assets/fonts/PixelifySans.ttf`.
@@ -239,7 +239,7 @@ The door sensor is centered at the last main platform's center X and 55 units ab
 | Enemy bed | Collision body `90 × 64` | [`Enemy.tsx`](./src/entities/Enemy.tsx) renders at `100 × (100 * 166 / 219)` units (about `100 × 75.8`), centered over the moving body. Visual art is intentionally larger than its collision rectangle. |
 | Coin | Matter sensor circle radius `10` (20 diameter) | [`Coin.tsx`](./src/entities/Coin.tsx) draws a gold `20 × 20` circle at `body.position - (10, 10)`; renderer returns `null` after its label changes from `coin`. |
 | Exit door | Matter sensor `50 × 80` | [`Door.tsx`](./src/entities/Door.tsx) draws `76 × 96`, centered on the sensor body. |
-| Level 1 background | No collision body | `ImageBackground` covers the viewport with `resizeMode="cover"` in a box of viewport width × 120% viewport height, bottom aligned. It is omitted on other levels. |
+| Level backgrounds | No collision body | Levels 1 and 2 select their bundled image in `GameWorldRenderer.tsx`. `ImageBackground` covers the viewport with `resizeMode="cover"` in a box of viewport width × 120% viewport height, bottom aligned; other levels omit the image. |
 | HUD | Layout-driven | Positioned at top 16 / left 16 / right 80 with z-index 100; score is top 60 / left 20. Concentration fill width is the concentration percentage. |
 | Touch controls | Three `70 × 70` buttons | Container is bottom 12, left/right 12, height 76, z-index 120; left/right share a row, jump is on the opposite side. |
 | Idle speech bubble | Width 152, horizontally centered over the 104-unit sprite; bottom `104 + 4` | Rendered only when horizontal movement and jump thresholds indicate idle. It is presentation only and has no collision body. |
@@ -254,3 +254,9 @@ worldContent.top  = -cameraY
 ```
 
 `clamp(value, min, max)` means `max(min, min(value, max))`. The world viewport clips the translated content. The game engine runs only while `isPaused` is false; the timer and music are likewise paused by game state. Controls render above the game world, while the level background is behind the translated entities.
+
+## Entry 08 — Change log: level 2 background and mobile viewport
+
+- **2026-11-05 — Level 2 bus background:** Added the supplied bus interior image as `assets/level2bus.jpeg`. `src/components/GameWorldRenderer.tsx` chooses the level 1 or level 2 image from the level number and renders it behind the game entities. Levels without a configured image keep the existing plain viewport background.
+- **JavaScript/TypeScript implementation:** The background source is selected with static asset `require` calls, so Metro can bundle both images for native and web builds. The image remains presentation-only and does not change world dimensions, physics, or camera movement.
+- **Mobile styling and resolution:** Reuses `levelBackground` and `levelBackgroundImage` from `src/styles/GameScreenStyles.ts`. Their percentage dimensions respond to the game viewport on mobile screens; `resizeMode="cover"` fills it while preserving the image's aspect ratio, and the 120%-height, bottom-aligned container retains the existing landscape composition. The game viewport clips overflow, leaving the HUD, entities, and touch controls layered above the background.

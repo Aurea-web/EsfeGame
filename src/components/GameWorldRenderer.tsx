@@ -17,6 +17,12 @@ export default function GameWorldRenderer(
 ) {
   if (!entities?.player || !layout) return null;
 
+  const backgroundSource =
+    level === 1
+      ? require("../../assets/La cama.jpg")
+      : level === 2
+        ? require("../../assets/level2bus.jpeg")
+        : null;
   const cameraX = Math.max(
     0,
     Math.min(
@@ -34,9 +40,9 @@ export default function GameWorldRenderer(
 
   return (
     <View style={gameScreenStyles.worldViewport}>
-      {level === 1 && (
+      {backgroundSource && (
         <ImageBackground
-          source={require("../../assets/La cama.jpg")}
+          source={backgroundSource}
           resizeMode="cover"
           style={gameScreenStyles.levelBackground}
           imageStyle={gameScreenStyles.levelBackgroundImage}
