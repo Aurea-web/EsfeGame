@@ -36,9 +36,13 @@ export default function GameScreen({ navigation, route }: any) {
   const [gameKey, setGameKey] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(120);
+  const [health, setHealth] = useState(100);
+  const [playerHit, setPlayerHit] = useState(false);
   const { engine, player, entities } = game;
   const playerRef = useRef(player);
   const scoreRef = useRef(0);
+  const healthRef = useRef(100);
+  const hitFlashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const gameEndedRef = useRef(false);
   const pressedDirections = useRef({ left: false, right: false });
   const movementDirectionRef = useRef<MovementDirection>(null);
@@ -159,13 +163,18 @@ export default function GameScreen({ navigation, route }: any) {
     setGameKey((key) => key + 1);
     setScore(0);
     scoreRef.current = 0;
+    healthRef.current = 100;
+    setHealth(100);
     gameEndedRef.current = false;
     setIsPaused(false);
     setRemainingSeconds(120);
   };
 
   const elapsedRatio = (120 - remainingSeconds) / 120;
-  const concentration = Math.max(0, 100 - Math.round(elapsedRatio * 100));
+  const concentration = Math.max(
+    0,
+    Math.round(health - elapsedRatio * 100)
+  );
 
   useEffect(() => {
     if (remainingSeconds > 0 || gameEndedRef.current) return;
@@ -195,6 +204,30 @@ export default function GameScreen({ navigation, route }: any) {
         level,
         character,
       });
+    }
+    if (event.type === "telefono-hit" && !gameEndedRef.current) {
+      setPlayerHit(true);
+      if (hitFlashTimeoutRef.current) {
+        clearTimeout(hitFlashTimeoutRef.current);
+      }
+      hitFlashTimeoutRef.current = setTimeout(
+        () => setPlayerHit(false),
+        250
+      );
+      const nextHealth = Math.max(0, healthRef.current - 10);
+      healthRef.current = nextHealth;
+      setHealth(nextHealth);
+
+      if (nextHealth === 0) {
+        gameEndedRef.current = true;
+        clearMovement();
+        setIsPaused(true);
+        navigation.replace("Lose", {
+          score: scoreRef.current,
+          level,
+          character,
+        });
+      }
     }
     if (event.type === "win" && !gameEndedRef.current) {
       gameEndedRef.current = true;
@@ -259,6 +292,7 @@ export default function GameScreen({ navigation, route }: any) {
           onEvent={handleEvent}
           character={character}
           level={level}
+          playerHit={playerHit}
         />
         <PauseMenu
           isPaused={isPaused}

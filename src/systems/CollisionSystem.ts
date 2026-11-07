@@ -117,22 +117,22 @@ const CollisionSystem = (
             labels.includes("player") &&
             labels.includes("enemy")
           ) {
-            const player = bodyA.label === "player" ? bodyA : bodyB;
-            const enemy = bodyA.label === "enemy" ? bodyA : bodyB;
-            const normalY =
-              player === bodyA
-                ? pair.collision.normal.y
-                : -pair.collision.normal.y;
-            const landedOnBed = normalY < -0.5;
-            const jumpingUpThroughBed =
-              player.velocity.y < 0 &&
-              player.position.y > enemy.position.y;
+            dispatch({
+              type: "enemy-hit",
+            });
+          }
 
-            if (!landedOnBed && !jumpingUpThroughBed) {
-              dispatch({
-                type: "enemy-hit",
-              });
-            }
+          if (
+            labels.includes("player") &&
+            labels.includes("telefono-projectile")
+          ) {
+            const projectile =
+              bodyA.label === "telefono-projectile" ? bodyA : bodyB;
+            projectile.label = "collected";
+            projectile.collisionFilter.mask = 0;
+            dispatch({
+              type: "telefono-hit",
+            });
           }
         });
       }

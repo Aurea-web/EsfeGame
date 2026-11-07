@@ -6,6 +6,7 @@ import Door from "../entities/Door";
 import Enemy from "../entities/Enemy";
 import Ground from "../entities/Ground";
 import Player from "../entities/Player";
+import Telefono from "../entities/Telefono";
 
 const { width, height } = Dimensions.get("window");
 export const worldWidth = Math.max(width * 3, width + 600);
@@ -13,6 +14,8 @@ export const worldHeight = Math.max(height * 1.35, 420);
 const groundY = worldHeight - 58;
 const enemyPlatformIndexes = new Set([1, 4, 7]);
 const enemyPatrolDistance = 40;
+const phonePlatformIndexes = new Set([2, 5]);
+const phonePatrolDistance = 30;
 const maxPlatformGap = 160;
 const maxPlatformHeightStep = 40;
 
@@ -66,6 +69,19 @@ export const createGameState = (level = 1): GameState => {
 
     return { platform, coin, isEnemyBed };
   });
+  const phones = platforms
+    .filter((_, index) => phonePlatformIndexes.has(index))
+    .map(({ platform }) => {
+      const phone = Matter.Bodies.rectangle(
+        platform.position.x,
+        platform.position.y - 55,
+        48,
+        48,
+        { isStatic: true, isSensor: true, restitution: 0 }
+      );
+      phone.label = "enemy";
+      return phone;
+    });
   const createAccessPlatforms = (
     startX: number,
     endX: number,
@@ -186,6 +202,7 @@ export const createGameState = (level = 1): GameState => {
     ...parkourPlatforms.map(({ coin }) => coin),
     ...sideWalls,
     ...platforms.flatMap(({ platform, coin }) => [platform, coin]),
+    ...phones,
   ]);
 
   const entities: Record<string, any> = {
@@ -238,6 +255,21 @@ export const createGameState = (level = 1): GameState => {
     entities[`parkourCoin${index + 1}`] = {
       body: coin,
       renderer: Coin,
+    };
+  });
+
+  phones.forEach((phone, index) => {
+    const distanceBetweenPlatforms =
+      platformPositions[1] - platformPositions[0];
+    entities[`telefono${index + 1}`] = {
+      body: phone,
+      renderer: Telefono,
+      patrolMinY: phone.position.y - phonePatrolDistance,
+      patrolMaxY: phone.position.y + phonePatrolDistance,
+      patrolDirection: index % 2 === 0 ? 1 : -1,
+      attackRange: distanceBetweenPlatforms * 3,
+      shootCooldown: 1800 + index * 700,
+      shootingTimer: 0,
     };
   });
 

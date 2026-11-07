@@ -22,6 +22,14 @@ export const playerStyles = StyleSheet.create({
     left: 0,
     height: playerFrameSize,
   },
+  hitFlash: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: playerFrameSize,
+    height: playerFrameSize,
+    backgroundColor: "rgba(255, 0, 0, 0.78)",
+  },
   speechBubble: {
     position: "absolute",
     left: (playerFrameSize - 152) / 2,

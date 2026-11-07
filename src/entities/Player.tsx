@@ -17,12 +17,14 @@ type PlayerProps = {
   body: Matter.Body;
   character?: PlayerCharacter;
   facingLeft?: boolean;
+  isHit?: boolean;
 };
 
 export default function Player({
   body,
   character = "female",
   facingLeft = false,
+  isHit = false,
 }: PlayerProps) {
   const sprites = playerSprites[character];
   const isMoving = Math.abs(body.velocity.x) > movementThreshold;
@@ -101,6 +103,12 @@ export default function Player({
             getSpriteSheetStyle(frame, frameCount),
           ]}
         />
+        {isHit && (
+          <View
+            accessibilityLabel="Personaje impactado"
+            style={playerStyles.hitFlash}
+          />
+        )}
       </View>
     </View>
   );

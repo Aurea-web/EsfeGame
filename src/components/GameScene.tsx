@@ -6,9 +6,13 @@ import CollisionSystem from "../systems/CollisionSystem";
 import { PlayerCharacter } from "../entities/PlayerSprites";
 import { gameScreenStyles } from "../styles/GameScreenStyles";
 import GameWorldRenderer from "./GameWorldRenderer";
+import RayoRojo from "../entities/RayoRojo";
 
 const MAX_PHYSICS_STEP_MS = 16.6;
 const ENEMY_FLOAT_SPEED = 75;
+const PHONE_SHOOT_INTERVAL = 3200;
+const PHONE_PROJECTILE_SPEED = 54;
+const PHONE_SHOOT_ANIMATION_MS = 300;
 
 type MovementDirection = "left" | "right" | null;
 
@@ -21,6 +25,7 @@ type GameSceneProps = {
   onEvent: (event: { type: string }) => void;
   character?: PlayerCharacter;
   level?: number;
+  playerHit?: boolean;
 };
 
 export default function GameScene({
@@ -32,12 +37,20 @@ export default function GameScene({
   onEvent,
   character = "female",
   level = 1,
+  playerHit = false,
 }: GameSceneProps) {
   return (
     <GameEngine
       key={gameKey}
       style={gameScreenStyles.engine}
       running={!isPaused}
+      entities={{
+        ...entities,
+        player: {
+          ...entities.player,
+          isHit: playerHit,
+        },
+      }}
       renderer={(entities: Record<string, any>, screen: any, layout: any) =>
         GameWorldRenderer(entities, screen, layout, level, character)
       }
@@ -85,6 +98,67 @@ export default function GameScene({
               x: enemy.body.position.x,
               y: nextY,
             });
+
+            if (typeof enemy.shootCooldown === "number") {
+              enemy.shootCooldown -= delta;
+              enemy.shootingTimer = Math.max(
+                (enemy.shootingTimer || 0) - delta,
+                0
+              );
+              enemy.isShooting = enemy.shootingTimer > 0;
+
+              const horizontalDistance = player
+                ? Math.abs(player.position.x - enemy.body.position.x)
+                : Infinity;
+              const attackRange =
+                typeof enemy.attackRange === "number"
+                  ? enemy.attackRange
+                  : Infinity;
+
+              if (
+                enemy.shootCooldown <= 0 &&
+                player &&
+                horizontalDistance <= attackRange
+              ) {
+                const shotDirection =
+                  player.position.x >= enemy.body.position.x ? 1 : -1;
+                const projectileId =
+                  `telefonoProjectile${Date.now()}${Math.random()}`;
+                const projectile = Matter.Bodies.rectangle(
+                  enemy.body.position.x + shotDirection * 28,
+                  enemy.body.position.y,
+                  70,
+                  8,
+                  { isSensor: true, restitution: 0 }
+                );
+                projectile.label = "telefono-projectile";
+                Matter.Body.setVelocity(projectile, {
+                  x: shotDirection * PHONE_PROJECTILE_SPEED,
+                  y: 0,
+                });
+                Matter.World.add(engine.world, projectile);
+                currentEntities[projectileId] = {
+                  body: projectile,
+                  renderer: RayoRojo,
+                  lifetime: 7000,
+                };
+                enemy.shootingTimer = PHONE_SHOOT_ANIMATION_MS;
+                enemy.isShooting = true;
+                enemy.shootCooldown = PHONE_SHOOT_INTERVAL;
+              }
+            }
+          });
+
+          Object.entries(currentEntities).forEach(([key, entity]: any) => {
+            if (typeof entity.lifetime !== "number") return;
+            entity.lifetime -= delta;
+            if (
+              entity.lifetime <= 0 ||
+              entity.body.label === "collected"
+            ) {
+              Matter.World.remove(engine.world, entity.body);
+              delete currentEntities[key];
+            }
           });
 
           Matter.Engine.update(
@@ -96,7 +170,6 @@ export default function GameScene({
         CollisionSystem,
       ]}
       onEvent={onEvent}
-      entities={entities}
     />
   );
 }

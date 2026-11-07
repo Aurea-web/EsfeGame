@@ -16,7 +16,11 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "package": "com.willian503.OperacionAntiProcrastinacion"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -44,6 +48,14 @@
           "enableBackgroundPlayback": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "expo-navigation-bar": {
+        "hidden": true
+      },
+      "eas": {
+        "projectId": "93af604d-f95c-4ab3-af16-271c81c027f3"
+      }
+    }
   }
 }
