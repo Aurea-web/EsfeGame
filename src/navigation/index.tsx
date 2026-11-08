@@ -2,6 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import HomeScreen from "../screens/HomeScreen";
+import GuideScreen from "../screens/GuideScreen";
 import LevelScreen from "../screens/LevelScreen";
 import CharacterSelectScreen from "../screens/CharacterSelectScreen";
 import GameScreen from "../screens/GameScreen";
@@ -21,6 +22,11 @@ export default function Navigation() {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
+        />
+
+        <Stack.Screen
+          name="Guide"
+          component={GuideScreen}
         />
 
         <Stack.Screen

@@ -57,6 +57,16 @@ export default function HomeScreen({ navigation }: any) {
       </View>
 
       <Text style={styles.signature}>Made with focus ⚡</Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => navigation.navigate("Guide")}
+        style={({ pressed }) => [
+          styles.guideButton,
+          pressed && styles.guideButtonPressed,
+        ]}
+      >
+        <Text style={styles.guideButtonText}>Guía de juego</Text>
+      </Pressable>
     </View>
   );
 }
@@ -76,6 +86,9 @@ const styles = StyleSheet.create({
   gradientButton: { flex: 1, borderRadius: 5, alignItems: "center", justifyContent: "center" },
   buttonText: { color: "#FFFFFF", fontFamily: "Fredoka", fontSize: 34, fontWeight: "800", textShadowColor: "rgba(4,18,55,0.8)", textShadowOffset: { width: 0, height: 3 }, textShadowRadius: 2 },
   signature: { position: "absolute", right: 20, bottom: 18, color: "#A259FF", fontFamily: "Fredoka", fontSize: 11, fontWeight: "300", opacity: 0.85 },
+  guideButton: { position: "absolute", left: 20, bottom: 14, minHeight: 44, justifyContent: "center", paddingHorizontal: 16, borderWidth: 1, borderColor: "#00CFFF", borderRadius: 10, backgroundColor: "rgba(16,44,104,0.8)" },
+  guideButtonPressed: { opacity: 0.75 },
+  guideButtonText: { color: "#DDF9FF", fontFamily: "Fredoka", fontSize: 16, fontWeight: "700" },
   shape: { position: "absolute", backgroundColor: "rgba(30,38,51,0.42)" },
   circleOne: { width: 130, height: 130, borderRadius: 65, left: -35, top: "16%" },
   circleTwo: { width: 96, height: 96, borderRadius: 48, right: "12%", bottom: "12%", borderWidth: 18, borderColor: "rgba(162,89,255,0.16)", backgroundColor: "transparent" },

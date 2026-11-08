@@ -4,7 +4,7 @@
 
 - **Runtime:** Expo SDK 58, React Native 0.88, React 19, and TypeScript in `.tsx` and `.ts` files.
 - **Targets:** iOS, Android, and web; the app is configured for landscape orientation.
-- **Startup:** [`App.tsx`](./App.tsx) loads the Fredoka and Pixelify Sans fonts, configures audio, and locks native devices to landscape. [`src/navigation/index.tsx`](./src/navigation/index.tsx) defines the Home → Levels → CharacterSelect → Game → Win/Lose flow.
+- **Startup:** [`App.tsx`](./App.tsx) loads the Fredoka and Pixelify Sans fonts, configures audio, and locks native devices to landscape. [`src/navigation/index.tsx`](./src/navigation/index.tsx) defines the Home → Guide or Levels → CharacterSelect → Game → Win/Lose flow.
 - **Persistence:** [`src/services/LevelProgress.ts`](./src/services/LevelProgress.ts) saves the highest completed level in AsyncStorage. Levels unlock in order.
 
 ## Entry 02 — Screens and button behavior
@@ -12,7 +12,10 @@
 | Screen / control | Behavior and conditions |
 | --- | --- |
 | Home — **Niveles** | Navigates to the level list. |
+| Home — **Guía de juego** | Opens the game guide with touch and keyboard controls, objectives, and practice tips. |
 | Home — **Créditos** | Opens the credits alert. |
+| Guide — **Elegir nivel** | Navigates to the level list to start practicing. |
+| Guide — **Volver al inicio** | Returns to the home screen. |
 | Levels — level card | Starts that level when unlocked. The next level unlocks after completing the previous one; saved progress is reloaded whenever the screen regains focus. |
 | Levels — **Reintentar** | Retries loading saved progress if the storage read failed. |
 | Game — left/right touch controls | Hold to move; releasing stops horizontal movement. The direction uses fixed horizontal velocity. |
