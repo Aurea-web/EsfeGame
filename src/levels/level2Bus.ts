@@ -5,6 +5,7 @@ import Door from "../entities/Door";
 import Enemy from "../entities/Enemy";
 import Ground from "../entities/Ground";
 import Player from "../entities/Player";
+import PillowPlatform from "../entities/PillowPlatform";
 import Telefono from "../entities/Telefono";
 import { LevelContext, LevelEntities } from "./LevelTypes";
 
@@ -41,6 +42,39 @@ export function createBusLevel({
     );
     platform.label = isBed ? "enemy" : "platform";
     return { platform, isBed };
+  });
+  const firstBedSupport = Matter.Bodies.rectangle(
+    worldWidth * 0.305,
+    groundY - 255,
+    150,
+    platformHeight,
+    { isStatic: true, restitution: 0 }
+  );
+  firstBedSupport.label = "platform";
+  const bedTopSupport = Matter.Bodies.rectangle(
+    worldWidth * 0.34,
+    groundY - 350,
+    150,
+    platformHeight,
+    { isStatic: true, restitution: 0 }
+  );
+  bedTopSupport.label = "platform";
+  const pillowPlatforms = [
+    [0.22, 180],
+    [0.46, 225],
+    [0.61, 185],
+    [0.75, 225],
+    [0.89, 195],
+  ].map(([ratio, heightAboveGround]) => {
+    const platform = Matter.Bodies.rectangle(
+      worldWidth * ratio,
+      groundY - heightAboveGround,
+      120,
+      38,
+      { isStatic: true, restitution: 0 }
+    );
+    platform.label = "platform";
+    return platform;
   });
 
   const firstDynamic = Matter.Bodies.rectangle(
@@ -157,6 +191,9 @@ export function createBusLevel({
     ground,
     door,
     ...platforms.map(({ platform }) => platform),
+    firstBedSupport,
+    bedTopSupport,
+    ...pillowPlatforms,
     ...phoneRoute,
     firstDynamic,
     secondDynamic,
@@ -185,6 +222,20 @@ export function createBusLevel({
             patrolDirection: 1,
           }
         : {}),
+    };
+  });
+  entities.firstBedSupportPlatform = {
+    body: firstBedSupport,
+    renderer: PillowPlatform,
+  };
+  entities.firstBedTopSupport = {
+    body: bedTopSupport,
+    renderer: Ground,
+  };
+  pillowPlatforms.forEach((platform, index) => {
+    entities[`pillowPlatform${index + 1}`] = {
+      body: platform,
+      renderer: PillowPlatform,
     };
   });
 

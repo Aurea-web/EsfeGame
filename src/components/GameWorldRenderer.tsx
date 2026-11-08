@@ -22,6 +22,10 @@ export default function GameWorldRenderer(
       ? require("../../assets/La cama.jpg")
       : level === 2
         ? require("../../assets/level2bus.jpeg")
+        : level === 3
+          ? require("../../assets/El campus.jpg")
+          : level === 4
+            ? require("../../assets/El aula.jpg")
         : null;
   const cameraX = Math.max(
     0,
