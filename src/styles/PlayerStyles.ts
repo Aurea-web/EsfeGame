@@ -28,7 +28,10 @@ export const playerStyles = StyleSheet.create({
     left: 0,
     width: playerFrameSize,
     height: playerFrameSize,
-    backgroundColor: "rgba(255, 0, 0, 0.78)",
+    backgroundColor: "rgba(255, 0, 0, 0.55)",
+    borderWidth: 4,
+    borderColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: 52,
   },
   speechBubble: {
     position: "absolute",

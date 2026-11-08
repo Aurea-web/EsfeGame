@@ -7,6 +7,7 @@ import Enemy from "../entities/Enemy";
 import Ground from "../entities/Ground";
 import Player from "../entities/Player";
 import Telefono from "../entities/Telefono";
+import { createLevelEntities } from "../levels";
 
 const { width, height } = Dimensions.get("window");
 export const worldWidth = Math.max(width * 3, width + 600);
@@ -47,6 +48,18 @@ export const createGameState = (level = 1): GameState => {
     { isStatic: true, restitution: 0 }
   );
   ground.label = "ground";
+  const levelEntities = createLevelEntities(level, {
+    engine,
+    world,
+    player,
+    ground,
+    worldWidth,
+    worldHeight,
+    groundY,
+  });
+  if (levelEntities) {
+    return { engine, player, entities: levelEntities };
+  }
   const platformPositions = Array.from({ length: 10 }, (_, index) =>
     170 + ((worldWidth - 340) / 9) * index
   );
@@ -56,8 +69,8 @@ export const createGameState = (level = 1): GameState => {
     const platform = Matter.Bodies.rectangle(
       x,
       groundY - platformHeights[index],
-      isEnemyBed ? 90 : 150,
-      isEnemyBed ? 64 : 20,
+      isEnemyBed ? 100 : 150,
+      isEnemyBed ? 76 : 20,
       { isStatic: true, restitution: 0 }
     );
     platform.label = isEnemyBed ? "enemy" : "platform";

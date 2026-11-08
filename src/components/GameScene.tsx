@@ -82,8 +82,16 @@ export default function GameScene({
               return;
             }
 
+            if (enemy.patrolDirection === 0) {
+              return;
+            }
+
+            const patrolSpeed =
+              typeof enemy.patrolSpeed === "number"
+                ? enemy.patrolSpeed
+                : ENEMY_FLOAT_SPEED;
             const distance =
-              (ENEMY_FLOAT_SPEED * delta) / 1000 * enemy.patrolDirection;
+              (patrolSpeed * delta) / 1000 * enemy.patrolDirection;
             let nextY = enemy.body.position.y + distance;
 
             if (nextY <= enemy.patrolMinY) {

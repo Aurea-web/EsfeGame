@@ -116,7 +116,7 @@ export default function GameScreen({ navigation, route }: any) {
     });
   }, []);
 
-  const setDirectionPressed = (
+  const setDirectionPressed = useCallback((
     direction: "left" | "right",
     isPressed: boolean
   ) => {
@@ -147,7 +147,40 @@ export default function GameScreen({ navigation, route }: any) {
         y: playerRef.current.velocity.y,
       });
     }
-  };
+  }, [isPaused]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setDirectionPressed("left", true);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setDirectionPressed("right", true);
+      } else if ((event.key === " " || event.key === "ArrowUp") && !event.repeat) {
+        event.preventDefault();
+        if (!isPaused) jump(playerRef.current);
+      }
+    };
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setDirectionPressed("left", false);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setDirectionPressed("right", false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [isPaused, setDirectionPressed]);
 
   const pauseGame = () => {
     clearMovement();
@@ -198,12 +231,18 @@ export default function GameScreen({ navigation, route }: any) {
     if (event.type === "enemy-hit" && !gameEndedRef.current) {
       gameEndedRef.current = true;
       clearMovement();
-      setIsPaused(true);
-      navigation.replace("Lose", {
-        score: scoreRef.current,
-        level,
-        character,
-      });
+      setPlayerHit(true);
+      healthRef.current = 0;
+      setHealth(0);
+      hitFlashTimeoutRef.current = setTimeout(() => {
+        setPlayerHit(false);
+        setIsPaused(true);
+        navigation.replace("Lose", {
+          score: scoreRef.current,
+          level,
+          character,
+        });
+      }, 250);
     }
     if (event.type === "telefono-hit" && !gameEndedRef.current) {
       setPlayerHit(true);
