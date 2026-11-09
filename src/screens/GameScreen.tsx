@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BackHandler, Text, View } from "react-native";
+import { BackHandler, Platform, Text, View } from "react-native";
 import Matter from "matter-js";
 import { useAudioPlayer } from "expo-audio";
 import { LinearGradient } from "expo-linear-gradient";
@@ -150,7 +150,7 @@ export default function GameScreen({ navigation, route }: any) {
   }, [isPaused]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (Platform.OS !== "web" || typeof window === "undefined") return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
