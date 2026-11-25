@@ -41,10 +41,20 @@ export const mobileControlsStyles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 5,
   },
-  buttonText: {
-    color: "#ffffff",
-    fontSize: 22,
-    fontWeight: "bold",
+  moveLeftIcon: {
+    width: 48,
+    height: 48,
+    resizeMode: "contain",
+  },
+  moveRightIcon: {
+    width: 48,
+    height: 48,
+    resizeMode: "contain",
+  },
+  jumpIcon: {
+    width: 48,
+    height: 48,
+    resizeMode: "contain",
   },
   pressedButton: {
     opacity: 0.75,

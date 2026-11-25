@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BackHandler, Platform, Text, View } from "react-native";
+import { BackHandler, Image, Platform, Text, View } from "react-native";
 import Matter from "matter-js";
 import { useAudioPlayer } from "expo-audio";
 import { LinearGradient } from "expo-linear-gradient";
@@ -296,7 +296,11 @@ export default function GameScreen({ navigation, route }: any) {
       <View style={gameScreenStyles.gameArea}>
         <View style={gameScreenStyles.hud}>
           <View style={gameScreenStyles.timerContainer}>
-            <Text style={gameScreenStyles.clockIcon}>◷</Text>
+            <Image
+              source={require("../../assets/acute-clock.png")}
+              style={gameScreenStyles.clockIcon}
+              accessibilityLabel="Tiempo restante"
+            />
             <Text style={gameScreenStyles.timer}>{timerText}</Text>
           </View>
           <View style={gameScreenStyles.concentrationContainer}>

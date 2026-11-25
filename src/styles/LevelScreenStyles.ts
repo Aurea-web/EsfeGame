@@ -149,6 +149,11 @@ export const levelScreenStyles = StyleSheet.create({
     fontWeight: "800",
     textAlign: "right",
   },
+  completedIndicator: {
+    width: 28,
+    height: 28,
+    resizeMode: "contain",
+  },
   messageContainer: {
     alignItems: "center",
     gap: 14,

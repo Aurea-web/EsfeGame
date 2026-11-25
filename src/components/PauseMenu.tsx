@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 
 import { pauseMenuStyles as styles } from "../styles/PauseMenuStyles";
 
@@ -28,10 +28,11 @@ export default function PauseMenu({
           pressed && styles.pressedPauseButton,
         ]}
       >
-        <View style={styles.pauseIcon}>
-          <View style={styles.pauseBar} />
-          <View style={styles.pauseBar} />
-        </View>
+        <Image
+          source={require("../../assets/pause-circle.png")}
+          style={styles.pauseIcon}
+          accessibilityLabel="Pausar juego"
+        />
       </Pressable>
 
       {isPaused && (

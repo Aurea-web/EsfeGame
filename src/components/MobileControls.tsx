@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { Image, View } from "react-native";
 import type { ReactNode } from "react";
 import type { GestureResponderEvent } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -98,21 +98,30 @@ export default function MobileControls({
           onPressIn={onMoveLeftIn}
           onPressOut={onMoveLeftOut}
         >
-          <Text style={styles.buttonText}>←</Text>
+          <Image
+            source={require("../../assets/fast-rewind-left.png")}
+            style={styles.moveLeftIcon}
+          />
         </TouchButton>
         <TouchButton
           accessibilityLabel="Correr a la derecha"
           onPressIn={onMoveRightIn}
           onPressOut={onMoveRightOut}
         >
-          <Text style={styles.buttonText}>→</Text>
+          <Image
+            source={require("../../assets/fast-forward-right.png")}
+            style={styles.moveRightIcon}
+          />
         </TouchButton>
       </View>
       <TouchButton
         accessibilityLabel="Saltar"
         onActivate={onJump}
       >
-        <Text style={styles.buttonText}>↑</Text>
+        <Image
+          source={require("../../assets/eject-jump.png")}
+          style={styles.jumpIcon}
+        />
       </TouchButton>
     </View>
   );

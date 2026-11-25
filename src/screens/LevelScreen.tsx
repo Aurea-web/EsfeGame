@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { BackHandler, Pressable, ScrollView, Text, View } from "react-native";
+import { BackHandler, Image, Pressable, ScrollView, Text, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { levelScreenStyles } from "../styles/LevelScreenStyles";
@@ -177,9 +177,17 @@ export default function LevelsScreen({ navigation }: any) {
                               : "BLOQUEADO"}
                         </Text>
                       </View>
-                      <Text style={levelScreenStyles.levelIndicator}>
-                        {completed ? "✓" : unlocked ? "›" : "🔒"}
-                      </Text>
+                      {completed ? (
+                        <Image
+                          source={require("../../assets/done-outline.png")}
+                          style={levelScreenStyles.completedIndicator}
+                          accessibilityLabel="Nivel completado"
+                        />
+                      ) : (
+                        <Text style={levelScreenStyles.levelIndicator}>
+                          {unlocked ? "›" : "🔒"}
+                        </Text>
+                      )}
                     </LinearGradient>
                   </Pressable>
                 );

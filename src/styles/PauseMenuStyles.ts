@@ -9,7 +9,7 @@ export const pauseMenuStyles = StyleSheet.create({
     height: 48,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#808080",
     borderRadius: 24,
     elevation: 4,
     zIndex: 2,
@@ -18,14 +18,9 @@ export const pauseMenuStyles = StyleSheet.create({
     opacity: 0.75,
   },
   pauseIcon: {
-    flexDirection: "row",
-    gap: 5,
-  },
-  pauseBar: {
-    width: 4,
-    height: 18,
-    borderRadius: 2,
-    backgroundColor: "#0f172a",
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
   },
   overlay: {
     position: "absolute",

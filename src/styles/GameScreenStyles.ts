@@ -24,9 +24,9 @@ export const gameScreenStyles = StyleSheet.create({
     gap: 5,
   },
   clockIcon: {
-    color: "#EF4444",
-    fontSize: 28,
-    lineHeight: 32,
+    width: 32,
+    height: 32,
+    resizeMode: "contain",
   },
   timer: {
     color: "#EF4444",
